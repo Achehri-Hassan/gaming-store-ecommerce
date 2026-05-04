@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tech Shop - Gaming Gear</title>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Google Fonts (Cairo) -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-color: #0f172a;      /* Dark Blue */
+      --primary-color: #0f172a;
+      --accent-color: #16a34a;  /* Gaming Green */
+      --white-color: #ffffff;
+      --text-gray: #64748b;
+      --yellow-badge: #facc15;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Cairo', sans-serif;
+      background-color: #f8fafc;
+    }
+
+    /* --- Header Container --- */
+    .header {
+      width: 100%;
+      background: var(--white-color);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    /* --- Top Header (Dark Part) --- */
+    .top-header {
+      background: var(--bg-color);
+      padding: 12px 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: white;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .logo-icon {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 10px;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .logo:hover .logo-icon {
+      background: var(--accent-color);
+    }
+
+    .logo h1 {
+      font-size: 20px;
+      font-weight: 900;
+      margin: 0;
+      font-style: italic;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Search Box */
+    .search-box {
+      flex: 1;
+      max-width: 550px;
+      position: relative;
+      margin: 0 40px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 12px 20px 12px 110px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .search-box button {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      bottom: 5px;
+      background: var(--bg-color);
+      color: white;
+      border: 2px solid rgba(255,255,255,0.1);
+      padding: 0 20px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .search-box button:hover {
+      background: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+
+    /* Actions */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+    }
+
+    .account {
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .account span {
+      font-size: 11px;
+      color: #cbd5e1;
+    }
+
+    .account-link {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .cart {
+      position: relative;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .cart i { font-size: 24px; }
+    .cart:hover { color: var(--yellow-badge); }
+
+    .cart-badge {
+      position: absolute;
+      top: -8px;
+      right: -10px;
+      background: var(--yellow-badge);
+      color: #000;
+      font-size: 11px;
+      font-weight: bold;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--bg-color);
+    }
+
+    /* --- Navbar (White Part) --- */
+    .navbar {
+      background: var(--white-color);
+      display: flex;
+      align-items: center;
+      padding: 0 50px;
+      height: 55px;
+      border-bottom: 1px solid #f1f5f9;
+      gap: 30px;
+    }
+
+    /* Categories Dropdown */
+    .categories {
+      position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .category-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 20px;
+      background: var(--bg-color);
+      color: white;
+      height: 42px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .category-btn:hover {
+      background: #1e293b;
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      min-width: 230px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-radius: 0 0 12px 12px;
+      list-style: none;
+      padding: 10px 0;
+      margin: 0;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(15px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      border: 1px solid #f1f5f9;
+    }
+
+    .categories:hover .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-menu li a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 12px 20px;
+      color: #334155;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .dropdown-menu li a i {
+      width: 20px;
+      text-align: center;
+      color: var(--accent-color);
+    }
+
+    .dropdown-menu li a:hover {
+      background: #f8fafc;
+      color: var(--primary-color);
+      padding-left: 28px;
+    }
+
+    /* Nav Links */
+    .nav-links {
+      display: flex;
+      gap: 25px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+      position: relative;
+      padding: 5px 0;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent-color);
+      transition: 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--primary-color); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* Support Section */
+    .support {
+      margin-left: auto; /* Pushes to the right */
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .support i {
+      font-size: 20px;
+      color: var(--accent-color);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .top-header { padding: 12px 20px; }
+      .search-box { margin: 0 15px; }
+      .support { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <!-- Top Part -->
+    <div class="top-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <h1>Tech Shop</h1>
+      </div>
+
+      <div class="search-box">
+        <input type="text" placeholder="Search for latest tech, gaming gear..." />
+        <button>SEARCH</button>
+      </div>
+
+      <div class="header-actions">
+        <div class="account">
+          <span>Hello, Sign in</span>
+          <div class="account-link">
+            Account & Lists <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+          </div>
+        </div>
+
+        <div class="cart" id="cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-badge" id="cart-badge">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Part -->
+    <nav class="navbar">
+      <!-- Categories Dropdown -->
+      <div class="categories">
+        <div class="category-btn">
+          <i class="fas fa-bars"></i>
+          <span>Browse Categories</span>
+          <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+        </div>
+
+        <ul class="dropdown-menu">
+          <li><a href="mouse.html"><i class="fas fa-mouse"></i> Gaming Mice</a></li>
+          <li><a href="chairs.html"><i class="fas fa-chair"></i> Gaming Chairs</a></li>
+          <li><a href="desks.html"><i class="fas fa-desktop"></i> Gaming Desks</a></li>
+          <li><a href="playstation.html"><i class="fab fa-playstation"></i> PlayStation Gear</a></li>
+          <li><a href="hardware.html"><i class="fas fa-microchip"></i> PC Components</a></li>
+        </ul>
+      </div>
+
+      <!-- Main Links -->
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="shop-details.html">Shop</a>
+        <a href="details.html">Deals</a>
+        <a href="#">Contact</a>
+      </div>
+
+      <!-- Support Info -->
+      <div class="support">
+        <i class="fas fa-headset"></i>
+        <span>24/7 Support: +212 600 000 000</span>
+      </div>
+    </nav>
+  </header>
+
+</body>
+</html>

@@ -12,7 +12,10 @@
 @import url("delevry.css");
 
 
-/* Reset */
+html{
+    scroll-behavior: smooth
+}
+
 
 
 /* Start Main Sections */

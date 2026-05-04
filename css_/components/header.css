@@ -1,6 +1,3 @@
-
-
-
 /* Header */
 .header {
   width: 100%;
@@ -11,7 +8,7 @@
 
 /* Top Header */
 .top-header {
-  background: var( --bg-color);
+  background: var(--bg-color);
   padding: 12px 35px;
   display: flex;
   align-items: center;
@@ -25,7 +22,7 @@
   align-items: center;
   gap: 10px;
   cursor: pointer;
- 
+
 }
 
 .logo-icon {
@@ -68,8 +65,8 @@
   right: 5px;
   top: 5px;
   bottom: 5px;
-  background:var(--bg-color);
-  color: var( --white-color);
+  background: var(--bg-color);
+  color: var(--white-color);
   border: none;
   padding: 0 20px;
   border-radius: 6px;
@@ -86,7 +83,7 @@
   display: flex;
   align-items: center;
   gap: 30px;
-  
+
 }
 
 /* Account */
@@ -124,7 +121,7 @@
   top: -5px;
   right: -8px;
   background: #facc15;
-  color: var(--black );
+  color: var(--black);
   font-size: 11px;
   font-weight: bold;
   width: 18px;
@@ -145,21 +142,79 @@
   border-bottom: 1px solid #eee;
 }
 
-/* Categories */
+
+/* Categories Dropdown */
 .categories {
-  background: var(--bg-color);
-  color: white;
-  padding: 10px 20px;
+  position: relative;
+  height: 100%;
   display: flex;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 12px;
+  align-items: center;
+}
+
+.category-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  background: var(--bg-color);
+  color: var(--white-color);
+  height: 42px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: bold;
+  cursor: pointer;
   transition: 0.3s ease;
 }
 
-.categories:hover {
-  background: #1b1b5d;
+
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--white-color);
+  min-width: 230px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 0 0 12px 12px;
+  list-style: none;
+  padding: 10px 0;
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(15px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  border: 1px solid #f1f5f9;
+}
+
+.categories:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-menu li a {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 20px;
+  color: #334155;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.dropdown-menu li a i {
+  width: 20px;
+  text-align: center;
+  color: var(--black);
+}
+
+.dropdown-menu li a:hover {
+  background: #f8fafc;
+  color: var(--primary-color);
+  padding-left: 28px;
 }
 
 /* Links */
