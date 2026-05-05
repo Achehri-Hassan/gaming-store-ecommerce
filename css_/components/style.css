@@ -308,6 +308,7 @@ html{
   grid-template-columns: 350px 1fr;
   gap: 40px;
   align-items: center;
+
 }
 
 .collection-info h2 {
@@ -341,8 +342,9 @@ html{
 /* Responsive: Telfon o Tablet */
 @media (max-width: 1024px) {
   .collection-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr ;
     text-align: center;
+
   }
 
   .collection-info {

@@ -1,371 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tech Shop - Gaming Gear</title>
-  
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Google Fonts (Cairo) -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechSpace Collection</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
-  <style>
-    :root {
-      --bg-color: #0f172a;      /* Dark Blue */
-      --primary-color: #0f172a;
-      --accent-color: #16a34a;  /* Gaming Green */
-      --white-color: #ffffff;
-      --text-gray: #64748b;
-      --yellow-badge: #facc15;
-    }
+    <style>
+        :root {
+            --white-color: #ffffff;
+            --second-color: #1a1a1a;
+            --gray-ligh: #888888;
+            --price: #00abbd; /* Lon cyan kima f l-image */
+            --green: #2ecc71;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+            --title-blue: #0046be; /* Lon dyal l-unwan */
+        }
 
-    body {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Cairo', sans-serif;
-      background-color: #f8fafc;
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
-    /* --- Header Container --- */
-    .header {
-      width: 100%;
-      background: var(--white-color);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      position: relative;
-    }
+        .tech-collection {
+            padding: 60px 5%;
+            background-color: var(--white-color);
+            margin-top: 20px;
+        }
 
-    /* --- Top Header (Dark Part) --- */
-    .top-header {
-      background: var(--bg-color);
-      padding: 12px 50px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: white;
-    }
+        .collection-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 40px;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-    }
+        .collection-info h2 {
+            font-size: 32px;
+            color: var(--second-color);
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
 
-    .logo-icon {
-      background: rgba(255, 255, 255, 0.15);
-      padding: 10px;
-      border-radius: 10px;
-      transition: 0.3s;
-    }
+        .collection-info p {
+            color: var(--gray-ligh);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
 
-    .logo:hover .logo-icon {
-      background: var(--accent-color);
-    }
+        .see-more-btn {
+            display: inline-block;
+            padding: 12px 35px;
+            background: transparent;
+            border: 2px solid var(--second-color);
+            border-top-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            color: var(--second-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
 
-    .logo h1 {
-      font-size: 20px;
-      font-weight: 900;
-      margin: 0;
-      font-style: italic;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+        .see-more-btn:hover {
+            background: var(--second-color);
+            color: white;
+        }
 
-    /* Search Box */
-    .search-box {
-      flex: 1;
-      max-width: 550px;
-      position: relative;
-      margin: 0 40px;
-    }
+        .collection-slider-wrapper { min-width: 0; width: 100%; position: relative; }
 
-    .search-box input {
-      width: 100%;
-      padding: 12px 20px 12px 110px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      font-family: inherit;
-    }
+        /* --- PRODUCT CARD STYLE --- */
+        .p-card {
+            background: var(--white-color);
+            border: 1px solid #f0f0f0;
+            padding: 25px;
+            border-radius: 8px;
+            height: 100%;
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
 
-    .search-box button {
-      position: absolute;
-      right: 5px;
-      top: 5px;
-      bottom: 5px;
-      background: var(--bg-color);
-      color: white;
-      border: 2px solid rgba(255,255,255,0.1);
-      padding: 0 20px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+        .p-card:hover { box-shadow: var(--shadow); }
 
-    .search-box button:hover {
-      background: var(--accent-color);
-      border-color: var(--accent-color);
-    }
+        .p-img {
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
 
-    /* Actions */
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 25px;
-    }
+        .p-img img { max-width: 100%; max-height: 100%; transition: 0.4s ease-in-out; }
+        .p-img .hover-img {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(1.1);
+            opacity: 0;
+        }
 
-    .account {
-      display: flex;
-      flex-direction: column;
-      cursor: pointer;
-    }
+        .p-card:hover .main-img { opacity: 0; }
+        .p-card:hover .hover-img { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-    .account span {
-      font-size: 11px;
-      color: #cbd5e1;
-    }
+        .p-brand {
+            font-size: 14px;
+            color: #b1b1b1;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-align: center;
+            display: block;
+            margin-bottom: 8px;
+        }
 
-    .account-link {
-      font-weight: bold;
-      font-size: 14px;
-    }
+        .p-details h3 {
+            font-size: 17px;
+            color: var(--title-blue);
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+            height: 45px;
+            overflow: hidden;
+        }
 
-    .cart {
-      position: relative;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+        /* Layout dyal l-price w l-bag kima f l-image */
+        .p-shop {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+            margin-bottom: 12px;
+        }
 
-    .cart i { font-size: 24px; }
-    .cart:hover { color: var(--yellow-badge); }
+        .p-price {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--price);
+        }
 
-    .cart-badge {
-      position: absolute;
-      top: -8px;
-      right: -10px;
-      background: var(--yellow-badge);
-      color: #000;
-      font-size: 11px;
-      font-weight: bold;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid var(--bg-color);
-    }
+        .add-to-cart-btn {
+            background: #5d5d5d;
+            color: white;
+            width: 45px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 20px;
+            cursor: pointer;
+        }
 
-    /* --- Navbar (White Part) --- */
-    .navbar {
-      background: var(--white-color);
-      display: flex;
-      align-items: center;
-      padding: 0 50px;
-      height: 55px;
-      border-bottom: 1px solid #f1f5f9;
-      gap: 30px;
-    }
+        .p-stock {
+            color: var(--green);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-    /* Categories Dropdown */
-    .categories {
-      position: relative;
-      height: 100%;
-      display: flex;
-      align-items: center;
-    }
+        .dott { width: 10px; height: 10px; background: var(--green); border-radius: 50%; }
 
-    .category-btn {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 20px;
-      background: var(--bg-color);
-      color: white;
-      height: 42px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s ease;
-    }
+        /* --- RESPONSIVE ADJUSTMENTS --- */
 
-    .category-btn:hover {
-      background: #1e293b;
-    }
+        /* Tablets & Small Desktops */
+        @media (max-width: 1100px) {
+            .collection-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 30px;
+            }
+            .collection-info { max-width: 600px; margin: 0 auto; }
+        }
 
-    .dropdown-menu {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      background: white;
-      min-width: 230px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      border-radius: 0 0 12px 12px;
-      list-style: none;
-      padding: 10px 0;
-      margin: 0;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(15px);
-      transition: all 0.3s ease;
-      z-index: 1000;
-      border: 1px solid #f1f5f9;
-    }
+        /* Mobile Devices */
+        @media (max-width: 768px) {
+            .tech-collection { padding: 40px 15px; }
+            .collection-info h2 { font-size: 24px; }
+            
+            /* Zentage dyal text f mobile */
+            .p-details h3 { font-size: 16px; margin-bottom: 15px; }
+            .p-price { font-size: 21px; }
+            .p-img { height: 180px; }
+        }
 
-    .categories:hover .dropdown-menu {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-
-    .dropdown-menu li a {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 12px 20px;
-      color: #334155;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 600;
-      transition: 0.2s;
-    }
-
-    .dropdown-menu li a i {
-      width: 20px;
-      text-align: center;
-      color: var(--accent-color);
-    }
-
-    .dropdown-menu li a:hover {
-      background: #f8fafc;
-      color: var(--primary-color);
-      padding-left: 28px;
-    }
-
-    /* Nav Links */
-    .nav-links {
-      display: flex;
-      gap: 25px;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 700;
-      color: #475569;
-      position: relative;
-      padding: 5px 0;
-    }
-
-    .nav-links a::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: var(--accent-color);
-      transition: 0.3s;
-    }
-
-    .nav-links a:hover { color: var(--primary-color); }
-    .nav-links a:hover::after { width: 100%; }
-
-    /* Support Section */
-    .support {
-      margin-left: auto; /* Pushes to the right */
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      color: #64748b;
-      font-size: 13px;
-    }
-
-    .support i {
-      font-size: 20px;
-      color: var(--accent-color);
-    }
-
-    /* Responsive */
-    @media (max-width: 992px) {
-      .top-header { padding: 12px 20px; }
-      .search-box { margin: 0 15px; }
-      .support { display: none; }
-    }
-  </style>
+        /* Swiper Arrows Style */
+        .swiper-button-next, .swiper-button-prev {
+            color: #007aff;
+            transform: scale(0.7);
+        }
+    </style>
 </head>
 <body>
 
-  <header class="header">
-    <!-- Top Part -->
-    <div class="top-header">
-      <div class="logo">
-        <div class="logo-icon">
-          <i class="fas fa-shopping-cart"></i>
+    <section class="tech-collection" id="chair-section">
+        <div class="collection-container">
+            <!-- Sidebar Info -->
+            <div class="collection-info">
+                <h2>OUR COLLECTION OF DEVICES</h2>
+                <p>Our specialists at Techspace.ma have selected a wide choice of computer devices for you.</p>
+                <a href="#" class="see-more-btn">SHOP NOW</a>
+            </div>
+
+            <!-- Slider Wrapper -->
+            <div class="collection-slider-wrapper chair">
+                <div class="swiper mySwiper">
+                    <div class="swiper-wrapper">
+                        
+                        <!-- Slide 1 -->
+                        <div class="swiper-slide">
+                            <div class="p-card">
+                                <a href="shop-details.html?id=1">
+                                    <div class="p-img">
+                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="chair" class="main-img" />
+                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="chair gaming" class="hover-img" />
+                                    </div>
+                                </a>
+                                <div class="p-details">
+                                    <span class="p-brand">SKILLCHAIRS</span>
+                                    <h3>SKILLCHAIRS SC12 EVELYNNE</h3>
+                                    <div class="p-shop">
+                                        <div class="p-price">2990.00 dh</div>
+                                        <div class="add-to-cart-btn">
+                                            <i class="fa-solid fa-briefcase"></i>
+                                        </div>
+                                    </div>
+                                    <div class="p-stock">
+                                        <span class="dott"></span> In stock.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="swiper-slide">
+                            <div class="p-card">
+                                <a href="shop-details.html?id=2">
+                                    <div class="p-img">
+                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="Razer" class="main-img" />
+                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="Razer" class="hover-img" />
+                                    </div>
+                                </a>
+                                <div class="p-details">
+                                    <span class="p-brand">RAZER</span>
+                                    <h3>Razer Iskur V2 X Black</h3>
+                                    <div class="p-shop">
+                                        <div class="p-price">3499.00 dh</div>
+                                        <div class="add-to-cart-btn">
+                                            <i class="fa-solid fa-briefcase"></i>
+                                        </div>
+                                    </div>
+                                    <div class="p-stock">
+                                        <span class="dott"></span> In stock.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="swiper-slide">
+                            <div class="p-card">
+                                <a href="shop-details.html?id=3">
+                                    <div class="p-img">
+                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="Skill" class="main-img" />
+                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="Skill" class="hover-img" />
+                                    </div>
+                                </a>
+                                <div class="p-details">
+                                    <span class="p-brand">NOBLECHAIRS</span>
+                                    <h3>Noblechairs Epic Compact Black</h3>
+                                    <div class="p-shop">
+                                        <div class="p-price">3699.00 dh</div>
+                                        <div class="add-to-cart-btn">
+                                            <i class="fa-solid fa-briefcase"></i>
+                                        </div>
+                                    </div>
+                                    <div class="p-stock">
+                                        <span class="dott"></span> In stock.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Navigation -->
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+            </div>
         </div>
-        <h1>Tech Shop</h1>
-      </div>
+    </section>
 
-      <div class="search-box">
-        <input type="text" placeholder="Search for latest tech, gaming gear..." />
-        <button>SEARCH</button>
-      </div>
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
-      <div class="header-actions">
-        <div class="account">
-          <span>Hello, Sign in</span>
-          <div class="account-link">
-            Account & Lists <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
-          </div>
-        </div>
-
-        <div class="cart" id="cart">
-          <i class="fas fa-shopping-bag"></i>
-          <span class="cart-badge" id="cart-badge">0</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Navigation Part -->
-    <nav class="navbar">
-      <!-- Categories Dropdown -->
-      <div class="categories">
-        <div class="category-btn">
-          <i class="fas fa-bars"></i>
-          <span>Browse Categories</span>
-          <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
-        </div>
-
-        <ul class="dropdown-menu">
-          <li><a href="mouse.html"><i class="fas fa-mouse"></i> Gaming Mice</a></li>
-          <li><a href="chairs.html"><i class="fas fa-chair"></i> Gaming Chairs</a></li>
-          <li><a href="desks.html"><i class="fas fa-desktop"></i> Gaming Desks</a></li>
-          <li><a href="playstation.html"><i class="fab fa-playstation"></i> PlayStation Gear</a></li>
-          <li><a href="hardware.html"><i class="fas fa-microchip"></i> PC Components</a></li>
-        </ul>
-      </div>
-
-      <!-- Main Links -->
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="shop-details.html">Shop</a>
-        <a href="details.html">Deals</a>
-        <a href="#">Contact</a>
-      </div>
-
-      <!-- Support Info -->
-      <div class="support">
-        <i class="fas fa-headset"></i>
-        <span>24/7 Support: +212 600 000 000</span>
-      </div>
-    </nav>
-  </header>
-
+    <!-- Initialize Swiper -->
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            loop: true,
+            navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            },
+            breakpoints: {
+                480: { slidesPerView: 1, spaceBetween: 15 }, /* Mobiles */
+                768: { slidesPerView: 2, spaceBetween: 20 },   /* Tablets */
+                1200: { slidesPerView: 3, spaceBetween: 30 }   /* Desktops */
+            },
+        });
+    </script>
 </body>
 </html>
