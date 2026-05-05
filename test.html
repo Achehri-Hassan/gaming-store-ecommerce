@@ -1,296 +1,367 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TechSpace Collection</title>
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <!-- Swiper CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
 
     <style>
-        :root {
-            --white-color: #ffffff;
-            --second-color: #1a1a1a;
-            --gray-ligh: #888888;
-            --price: #00abbd; /* Lon cyan kima f l-image */
-            --green: #2ecc71;
-            --shadow: 0 4px 15px rgba(0,0,0,0.05);
-            --title-blue: #0046be; /* Lon dyal l-unwan */
-        }
+      :root {
+        --white-color: #ffffff;
+        --second-color: #1a1a1a;
+        --gray-ligh: #888888;
+        --price: #00abbd; /* Lon cyan kima f l-image */
+        --green: #2ecc71;
+        --shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        --title-blue: #0046be; /* Lon dyal l-unwan */
+      }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", sans-serif;
+      }
 
-        .tech-collection {
-            padding: 60px 5%;
-            background-color: var(--white-color);
-            margin-top: 20px;
-        }
+      .tech-collection {
+        padding: 60px 5%;
+        background-color: var(--white-color);
+        margin-top: 20px;
+      }
 
+      .collection-container {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 40px;
+        align-items: center;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .collection-info h2 {
+        font-size: 32px;
+        color: var(--second-color);
+        margin-bottom: 15px;
+        font-weight: 800;
+      }
+
+      .collection-info p {
+        color: var(--gray-ligh);
+        line-height: 1.6;
+        margin-bottom: 25px;
+      }
+
+      .see-more-btn {
+        display: inline-block;
+        padding: 12px 35px;
+        background: transparent;
+        border: 2px solid var(--second-color);
+        border-top-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        color: var(--second-color);
+        text-decoration: none;
+        font-weight: bold;
+        transition: 0.3s;
+      }
+
+      .see-more-btn:hover {
+        background: var(--second-color);
+        color: white;
+      }
+
+      .collection-slider-wrapper {
+        min-width: 0;
+        width: 100%;
+        position: relative;
+      }
+
+      /* --- PRODUCT CARD STYLE --- */
+      .p-card {
+        background: var(--white-color);
+        border: 1px solid #f0f0f0;
+        padding: 25px;
+        border-radius: 8px;
+        height: 100%;
+        transition: 0.3s;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .p-card:hover {
+        box-shadow: var(--shadow);
+      }
+
+      .p-img {
+        height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+
+      .p-img img {
+        max-width: 100%;
+        max-height: 100%;
+        transition: 0.4s ease-in-out;
+      }
+      .p-img .hover-img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(1.1);
+        opacity: 0;
+      }
+
+      .p-card:hover .main-img {
+        opacity: 0;
+      }
+      .p-card:hover .hover-img {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      .p-brand {
+        font-size: 14px;
+        color: #b1b1b1;
+        font-weight: 700;
+        text-transform: uppercase;
+        text-align: center;
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      .p-details h3 {
+        font-size: 17px;
+        color: var(--title-blue);
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 700;
+        height: 45px;
+        overflow: hidden;
+      }
+
+      /* Layout dyal l-price w l-bag kima f l-image */
+      .p-shop {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: auto;
+        margin-bottom: 12px;
+      }
+
+      .p-price {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--price);
+      }
+
+      .add-to-cart-btn {
+        background: #5d5d5d;
+        color: white;
+        width: 45px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      .p-stock {
+        color: var(--green);
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dott {
+        width: 10px;
+        height: 10px;
+        background: var(--green);
+        border-radius: 50%;
+      }
+
+      /* --- RESPONSIVE ADJUSTMENTS --- */
+
+      /* Tablets & Small Desktops */
+      @media (max-width: 1100px) {
         .collection-container {
-            display: grid;
-            grid-template-columns: 350px 1fr;
-            gap: 40px;
-            align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
+          grid-template-columns: 1fr;
+          text-align: center;
+          gap: 30px;
         }
+        .collection-info {
+          max-width: 600px;
+          margin: 0 auto;
+        }
+      }
 
+      /* Mobile Devices */
+      @media (max-width: 768px) {
+        .tech-collection {
+          padding: 40px 15px;
+        }
         .collection-info h2 {
-            font-size: 32px;
-            color: var(--second-color);
-            margin-bottom: 15px;
-            font-weight: 800;
+          font-size: 24px;
         }
 
-        .collection-info p {
-            color: var(--gray-ligh);
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-
-        .see-more-btn {
-            display: inline-block;
-            padding: 12px 35px;
-            background: transparent;
-            border: 2px solid var(--second-color);
-            border-top-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            color: var(--second-color);
-            text-decoration: none;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .see-more-btn:hover {
-            background: var(--second-color);
-            color: white;
-        }
-
-        .collection-slider-wrapper { min-width: 0; width: 100%; position: relative; }
-
-        /* --- PRODUCT CARD STYLE --- */
-        .p-card {
-            background: var(--white-color);
-            border: 1px solid #f0f0f0;
-            padding: 25px;
-            border-radius: 8px;
-            height: 100%;
-            transition: 0.3s;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .p-card:hover { box-shadow: var(--shadow); }
-
-        .p-img {
-            height: 220px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .p-img img { max-width: 100%; max-height: 100%; transition: 0.4s ease-in-out; }
-        .p-img .hover-img {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) scale(1.1);
-            opacity: 0;
-        }
-
-        .p-card:hover .main-img { opacity: 0; }
-        .p-card:hover .hover-img { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-
-        .p-brand {
-            font-size: 14px;
-            color: #b1b1b1;
-            font-weight: 700;
-            text-transform: uppercase;
-            text-align: center;
-            display: block;
-            margin-bottom: 8px;
-        }
-
+        /* Zentage dyal text f mobile */
         .p-details h3 {
-            font-size: 17px;
-            color: var(--title-blue);
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 700;
-            height: 45px;
-            overflow: hidden;
+          font-size: 16px;
+          margin-bottom: 15px;
         }
-
-        /* Layout dyal l-price w l-bag kima f l-image */
-        .p-shop {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: auto;
-            margin-bottom: 12px;
-        }
-
         .p-price {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--price);
+          font-size: 21px;
         }
-
-        .add-to-cart-btn {
-            background: #5d5d5d;
-            color: white;
-            width: 45px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            font-size: 20px;
-            cursor: pointer;
+        .p-img {
+          height: 180px;
         }
+      }
 
-        .p-stock {
-            color: var(--green);
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .dott { width: 10px; height: 10px; background: var(--green); border-radius: 50%; }
-
-        /* --- RESPONSIVE ADJUSTMENTS --- */
-
-        /* Tablets & Small Desktops */
-        @media (max-width: 1100px) {
-            .collection-container {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 30px;
-            }
-            .collection-info { max-width: 600px; margin: 0 auto; }
-        }
-
-        /* Mobile Devices */
-        @media (max-width: 768px) {
-            .tech-collection { padding: 40px 15px; }
-            .collection-info h2 { font-size: 24px; }
-            
-            /* Zentage dyal text f mobile */
-            .p-details h3 { font-size: 16px; margin-bottom: 15px; }
-            .p-price { font-size: 21px; }
-            .p-img { height: 180px; }
-        }
-
-        /* Swiper Arrows Style */
-        .swiper-button-next, .swiper-button-prev {
-            color: #007aff;
-            transform: scale(0.7);
-        }
+      /* Swiper Arrows Style */
+      .swiper-button-next,
+      .swiper-button-prev {
+        color: #007aff;
+        transform: scale(0.7);
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <section class="tech-collection" id="chair-section">
-        <div class="collection-container">
-            <!-- Sidebar Info -->
-            <div class="collection-info">
-                <h2>OUR COLLECTION OF DEVICES</h2>
-                <p>Our specialists at Techspace.ma have selected a wide choice of computer devices for you.</p>
-                <a href="#" class="see-more-btn">SHOP NOW</a>
-            </div>
-
-            <!-- Slider Wrapper -->
-            <div class="collection-slider-wrapper chair">
-                <div class="swiper mySwiper">
-                    <div class="swiper-wrapper">
-                        
-                        <!-- Slide 1 -->
-                        <div class="swiper-slide">
-                            <div class="p-card">
-                                <a href="shop-details.html?id=1">
-                                    <div class="p-img">
-                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="chair" class="main-img" />
-                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="chair gaming" class="hover-img" />
-                                    </div>
-                                </a>
-                                <div class="p-details">
-                                    <span class="p-brand">SKILLCHAIRS</span>
-                                    <h3>SKILLCHAIRS SC12 EVELYNNE</h3>
-                                    <div class="p-shop">
-                                        <div class="p-price">2990.00 dh</div>
-                                        <div class="add-to-cart-btn">
-                                            <i class="fa-solid fa-briefcase"></i>
-                                        </div>
-                                    </div>
-                                    <div class="p-stock">
-                                        <span class="dott"></span> In stock.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Slide 2 -->
-                        <div class="swiper-slide">
-                            <div class="p-card">
-                                <a href="shop-details.html?id=2">
-                                    <div class="p-img">
-                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="Razer" class="main-img" />
-                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="Razer" class="hover-img" />
-                                    </div>
-                                </a>
-                                <div class="p-details">
-                                    <span class="p-brand">RAZER</span>
-                                    <h3>Razer Iskur V2 X Black</h3>
-                                    <div class="p-shop">
-                                        <div class="p-price">3499.00 dh</div>
-                                        <div class="add-to-cart-btn">
-                                            <i class="fa-solid fa-briefcase"></i>
-                                        </div>
-                                    </div>
-                                    <div class="p-stock">
-                                        <span class="dott"></span> In stock.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Slide 3 -->
-                        <div class="swiper-slide">
-                            <div class="p-card">
-                                <a href="shop-details.html?id=3">
-                                    <div class="p-img">
-                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="Skill" class="main-img" />
-                                        <img src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png" alt="Skill" class="hover-img" />
-                                    </div>
-                                </a>
-                                <div class="p-details">
-                                    <span class="p-brand">NOBLECHAIRS</span>
-                                    <h3>Noblechairs Epic Compact Black</h3>
-                                    <div class="p-shop">
-                                        <div class="p-price">3699.00 dh</div>
-                                        <div class="add-to-cart-btn">
-                                            <i class="fa-solid fa-briefcase"></i>
-                                        </div>
-                                    </div>
-                                    <div class="p-stock">
-                                        <span class="dott"></span> In stock.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!-- Navigation -->
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
-                </div>
-            </div>
+      <div class="collection-container">
+        <!-- Sidebar Info -->
+        <div class="collection-info">
+          <h2>OUR COLLECTION OF DEVICES</h2>
+          <p>
+            Our specialists at Techspace.ma have selected a wide choice of
+            computer devices for you.
+          </p>
+          <a href="#" class="see-more-btn">SHOP NOW</a>
         </div>
+
+        <!-- Slider Wrapper -->
+        <div class="collection-slider-wrapper chair">
+          <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+              <!-- Slide 1 -->
+              <div class="swiper-slide">
+                <div class="p-card">
+                  <a href="shop-details.html?id=1">
+                    <div class="p-img">
+                      <img
+                        src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png"
+                        alt="chair"
+                        class="main-img"
+                      />
+                      <img
+                        src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png"
+                        alt="chair gaming"
+                        class="hover-img"
+                      />
+                    </div>
+                  </a>
+                  <div class="p-details">
+                    <span class="p-brand">SKILLCHAIRS</span>
+                    <h3>SKILLCHAIRS SC12 EVELYNNE</h3>
+                    <div class="p-shop">
+                      <div class="p-price">2990.00 dh</div>
+                      <div class="add-to-cart-btn">
+                        <i class="fa-solid fa-briefcase"></i>
+                      </div>
+                    </div>
+                    <div class="p-stock">
+                      <span class="dott"></span> In stock.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slide 2 -->
+              <div class="swiper-slide">
+                <div class="p-card">
+                  <a href="shop-details.html?id=2">
+                    <div class="p-img">
+                      <img
+                        src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png"
+                        alt="Razer"
+                        class="main-img"
+                      />
+                      <img
+                        src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png"
+                        alt="Razer"
+                        class="hover-img"
+                      />
+                    </div>
+                  </a>
+                  <div class="p-details">
+                    <span class="p-brand">RAZER</span>
+                    <h3>Razer Iskur V2 X Black</h3>
+                    <div class="p-shop">
+                      <div class="p-price">3499.00 dh</div>
+                      <div class="add-to-cart-btn">
+                        <i class="fa-solid fa-briefcase"></i>
+                      </div>
+                    </div>
+                    <div class="p-stock">
+                      <span class="dott"></span> In stock.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slide 3 -->
+              <div class="swiper-slide">
+                <div class="p-card">
+                  <a href="shop-details.html?id=3">
+                    <div class="p-img">
+                      <img
+                        src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png"
+                        alt="Skill"
+                        class="main-img"
+                      />
+                      <img
+                        src="https://assets2.razerzone.com/images/pnx.assets/941780d603a1da75e347466e3f538740/razer-iskur-v2-black.png"
+                        alt="Skill"
+                        class="hover-img"
+                      />
+                    </div>
+                  </a>
+                  <div class="p-details">
+                    <span class="p-brand">NOBLECHAIRS</span>
+                    <h3>Noblechairs Epic Compact Black</h3>
+                    <div class="p-shop">
+                      <div class="p-price">3699.00 dh</div>
+                      <div class="add-to-cart-btn">
+                        <i class="fa-solid fa-briefcase"></i>
+                      </div>
+                    </div>
+                    <div class="p-stock">
+                      <span class="dott"></span> In stock.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Navigation -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- Swiper JS -->
@@ -298,20 +369,20 @@
 
     <!-- Initialize Swiper -->
     <script>
-        var swiper = new Swiper(".mySwiper", {
-            slidesPerView: 1,
-            spaceBetween: 20,
-            loop: true,
-            navigation: {
-                nextEl: ".swiper-button-next",
-                prevEl: ".swiper-button-prev",
-            },
-            breakpoints: {
-                480: { slidesPerView: 1, spaceBetween: 15 }, /* Mobiles */
-                768: { slidesPerView: 2, spaceBetween: 20 },   /* Tablets */
-                1200: { slidesPerView: 3, spaceBetween: 30 }   /* Desktops */
-            },
-        });
+      var swiper = new Swiper(".mySwiper", {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        loop: true,
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
+        },
+        breakpoints: {
+          480: { slidesPerView: 1, spaceBetween: 15 } /* Mobiles */,
+          768: { slidesPerView: 2, spaceBetween: 20 } /* Tablets */,
+          1200: { slidesPerView: 3, spaceBetween: 30 } /* Desktops */,
+        },
+      });
     </script>
-</body>
+  </body>
 </html>
