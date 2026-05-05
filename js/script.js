@@ -61,7 +61,9 @@ var swiper = new Swiper(".mySwiper", {
         prevEl: ".prev",
     },
     breakpoints: {
-        640: { slidesPerView: 2 },
+     
+        530: { slidesPerView: 2 },
+        786 : {slidesPerView:3},
         1200: { slidesPerView: 3 }
     }
 });
@@ -84,17 +86,9 @@ const deskSwiper = new Swiper(".deskSwiper", {
   },
 
   breakpoints: {
-    320: {
-      slidesPerView: 1
-    },
-
-    768: {
-      slidesPerView: 2
-    },
-
-    1024: {
-      slidesPerView: 4
-    }
+    530: { slidesPerView: 2 },
+        786 : {slidesPerView:3},
+        1200: { slidesPerView: 3 }
   }
 });
 
@@ -112,16 +106,8 @@ const ControllerSwiper = new Swiper(".ControllerSwiper", {
   },
 
   breakpoints: {
-    320: {
-      slidesPerView: 1
-    },
-
-    768: {
-      slidesPerView: 2
-    },
-
-    1024: {
-      slidesPerView: 4
-    }
+    530: { slidesPerView: 2 },
+        786 : {slidesPerView:3},
+        1200: { slidesPerView: 3 }
   }
 });
