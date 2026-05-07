@@ -11,6 +11,7 @@ a {
     transition: 0.3s;
     height: 100%;
 
+
 }
 
 .p-card:hover {
@@ -125,11 +126,20 @@ a {
 }
 
 
+@media screen and (max-width:500px) {
+
+     .p-card{
+         margin-top: 30px;
+     }
+}
+
+
 @media (max-width: 768px) {
     .tech-collection {
         padding: 40px 15px;
     }
 
+   
     .collection-info h2 {
         font-size: 24px;
     }
@@ -147,4 +157,5 @@ a {
     .p-img {
         height: 180px;
     }
+
 }

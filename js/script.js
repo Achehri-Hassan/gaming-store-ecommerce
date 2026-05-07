@@ -63,7 +63,7 @@ var swiper = new Swiper(".mySwiper", {
     breakpoints: {
      
         530: { slidesPerView: 2 },
-        786 : {slidesPerView:3},
+        786 : {slidesPerView:2.5},
         1200: { slidesPerView: 3 }
     }
 });
@@ -88,7 +88,9 @@ const deskSwiper = new Swiper(".deskSwiper", {
   breakpoints: {
     530: { slidesPerView: 2 },
         786 : {slidesPerView:3},
-        1200: { slidesPerView: 3 }
+        900:{slidesPerView:3},
+        960:{slidesPerView:3.5},
+        1200: { slidesPerView: 4 }
   }
 });
 
@@ -105,9 +107,33 @@ const ControllerSwiper = new Swiper(".ControllerSwiper", {
     prevEl: ".Controller-prev",
   },
 
+ breakpoints: {
+    530: { slidesPerView: 2 },
+        786 : {slidesPerView:3},
+        900:{slidesPerView:3},
+        960:{slidesPerView:3.5},
+        1200: { slidesPerView: 4 }
+  }
+});
+
+
+
+const Playstaion = new Swiper(".playstation-swiper", {
+  slidesPerView: 1,
+  spaceBetween: 20,
+  loop: true,
+
+  navigation: {
+    
+    nextEl: ".playstation-next", 
+    prevEl: ".playstation-prev",
+  },
+
   breakpoints: {
     530: { slidesPerView: 2 },
         786 : {slidesPerView:3},
-        1200: { slidesPerView: 3 }
+        900:{slidesPerView:3},
+        960:{slidesPerView:3.5},
+        1200: { slidesPerView: 4 }
   }
 });

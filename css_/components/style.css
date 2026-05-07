@@ -360,7 +360,10 @@ html{
   align-items: center;
   justify-content: space-between;
   margin-bottom: 40px;
+  position: relative;
 }
+
+
 
 .section-title {
   background-color: var(--second-color);
@@ -370,7 +373,6 @@ html{
   font-size: 1rem;
 }
 
-.section-controls button,
 .section-controls button {
   background-color: var(--second-color);
   padding: 8px;
@@ -379,12 +381,11 @@ html{
   border: none;
   cursor: pointer;
   margin-left: 10px;
-
 }
 
-.section-controls button i,
-.section-controls button i {
+.section-controls button  {
   font-size: 20px;
+
 }
 
 .product-section .product-grid {
@@ -416,4 +417,23 @@ html{
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+}
+
+/* use button playStation block */
+.section-header .playstation_button{
+   display: none;
+}
+
+
+
+@media screen  and (max-width:490px){
+    .section-controls{
+       position: absolute;
+       top: 60px;
+       left: 0;
+       margin-left: -8px;
+    }
+    .section-header .playstation_button{
+       display: block;
+    }
 }
