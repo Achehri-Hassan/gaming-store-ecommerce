@@ -137,3 +137,53 @@ const Playstaion = new Swiper(".playstation-swiper", {
         1200: { slidesPerView: 4 }
   }
 });
+
+
+
+
+
+const mous= new Swiper(".mous-swiper", {
+  slidesPerView: 1,
+  spaceBetween: 20,
+  loop: true,
+
+  navigation: {
+    
+    nextEl: ".mous-next", 
+    prevEl: ".mous-prev",
+  },
+
+  breakpoints: {
+    530: { slidesPerView: 2 },
+        786 : {slidesPerView:3},
+        900:{slidesPerView:3},
+        960:{slidesPerView:3.5},
+        1200: { slidesPerView: 4 }
+  }
+});
+
+
+
+
+
+
+
+const ecran= new Swiper(".ecran-swiper", {
+  slidesPerView: 1,
+  spaceBetween: 20,
+  loop: true,
+
+  navigation: {
+    
+    nextEl: ".ecran-next", 
+    prevEl: ".ecran-prev",
+  },
+
+  breakpoints: {
+    530: { slidesPerView: 2 },
+        786 : {slidesPerView:3},
+        900:{slidesPerView:3},
+        960:{slidesPerView:3.5},
+        1200: { slidesPerView: 4 }
+  }
+});

@@ -424,16 +424,34 @@ html{
    display: none;
 }
 
+.section-header .mous_button{
+   display: none;
+}
+
+.section-header .ecran_button{
+   display: none;
+}
+
 
 
 @media screen  and (max-width:490px){
     .section-controls{
        position: absolute;
        top: 60px;
-       left: 0;
-       margin-left: -8px;
+       right: 0;
+       margin-right: 14px;
     }
     .section-header .playstation_button{
        display: block;
     }
+
+    .section-header .mous_button{
+       display: block;
+    }
+
+    .section-header .ecran_button{
+       display: block;
+    }
+
+
 }
