@@ -11,6 +11,7 @@
   font-family: Arial, sans-serif;
   justify-content: space-between;
   align-items: center;
+ 
   
 }
 
@@ -54,4 +55,48 @@
   margin: 5px 0 0;
   font-size: 0.85rem;
   color: #666;
+}
+
+
+/* ---- Tablet (≤ 900px) ---- */
+@media (max-width: 900px) {
+  .features-container {
+    padding: 60px 5%;
+    gap: 16px;
+  }
+
+  .card {
+    min-width: unset;
+    flex: 1;
+    padding: 1.5rem 18px;
+  }
+
+  .icon-section i {
+    font-size: 32px;
+  }
+
+  .text-section h3 {
+    font-size: 1rem;
+  }
+}
+
+/* ---- Mobile (≤ 600px) ---- */
+@media (max-width: 600px) {
+  .features-container {
+    flex-direction: column;
+    padding: 40px 5%;
+   
+    gap: 20px;
+  }
+
+  .card {
+    width: 100%;
+    padding: 1.25rem 20px;
+    
+   
+  }
+
+  .icon-section i {
+    font-size: 30px;
+  }
 }
