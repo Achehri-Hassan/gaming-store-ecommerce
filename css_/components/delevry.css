@@ -10,7 +10,8 @@
   gap: 20px;
   font-family: Arial, sans-serif;
   justify-content: space-between;
-  flex-wrap: wrap;
+  align-items: center;
+  
 }
 
 .card {
