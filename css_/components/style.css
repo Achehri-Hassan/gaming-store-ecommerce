@@ -95,6 +95,7 @@ html{
 .buttons {
   display: flex;
   gap: 16px;
+  
 }
 
 /* base button */
@@ -104,6 +105,7 @@ html{
   display: inline-block;
   transform: skewX(-10deg);
   transition: 0.3s;
+ 
 }
 
 .btn span {
@@ -168,6 +170,13 @@ html{
   .desc {
     font-size: 20px;
   }
+}
+
+@media screen  and (max-width:390px){
+       
+     .content .btn {
+          padding: 1rem 20px;
+     }
 }
 
 
