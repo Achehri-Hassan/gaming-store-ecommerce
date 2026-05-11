@@ -12,70 +12,83 @@
     <link rel="stylesheet" href="css_/css_shop/shop.css" />
   </head>
   <body>
-      <!-- Header -->
-  <header class="header">
-    <div class="top-header">
-      <div class="logo">
-        <div class="logo-icon">
-          <i class="fas fa-shopping-cart"></i>
-        </div>
-        <div>
-          <h1>Tech Shop</h1>
-        </div>
-      </div>
-
-      <div class="search-box">
-        <input type="text" placeholder="Search for latest tech, gaming gear..." />
-        <button>SEARCH</button>
-      </div>
-
-      <div class="header-actions">
-        <div class="account">
-          <span>Hello, Sign in</span>
-          <div class="account-link">
-            Account & Lists <i class="fas fa-chevron-down"></i>
+    <!-- Header -->
+    <header class="header">
+      <div class="top-header">
+        <div class="logo">
+          <div class="logo-icon">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <div>
+            <h1>Tech Shop</h1>
           </div>
         </div>
 
-        <div class="cart" id="cart">
-          <i class="fas fa-shopping-bag"></i>
-          <span class="cart-badge" id="cart-badge">0</span>
+        <div class="search-box">
+          <input
+            type="text"
+            placeholder="Search for latest tech, gaming gear..."
+          />
+          <button>SEARCH</button>
+        </div>
+
+        <div class="header-actions">
+          <div class="account">
+            <span>Hello, Sign in</span>
+            <div class="account-link">
+              Account &amp; Lists <i class="fas fa-chevron-down"></i>
+            </div>
+          </div>
+          <div class="cart" id="cart">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-badge" id="cart-badge">0</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <nav class="navbar">
-     
- <div class="categories">
-        <div class="category-btn">
-          <i class="fas fa-bars"></i>
-          <span>Browse Categories</span>
-          <i class="fas fa-chevron-down" style="font-size: 10px;"></i>
+      <nav class="navbar">
+        <div class="categories">
+          <div class="category-btn">
+            <i class="fas fa-bars"></i>
+            <span>Browse Categories</span>
+            <i class="fas fa-chevron-down" style="font-size: 10px"></i>
+          </div>
+          <ul class="dropdown-menu">
+            <li><a href="#chair-section">Gaming Chairs</a></li>
+            <li><a href="#desk-section">Gaming Desks</a></li>
+            <li><a href="#controllers-section">Controllers</a></li>
+            <li><a href="#playStation-section">PlayStation Gaming</a></li>
+            <li><a href="#mous-section">Mouse Gaming</a></li>
+            <li><a href="#ecran-section">Écran</a></li>
+          </ul>
         </div>
-      </div>
-      <div class="nav-links">
-        <a href="index.html">Home</a>
-        <a href="shop-details.html">Shop</a>
-        <a href="deails.html">Deals</a>
-        <a href="#">Contact</a>
-      </div>
 
-      <div class="support">
-        <i class="fas fa-headset"></i>
-        <span>24/7 Support: +212 600 000 000</span>
-      </div>
-    </nav>
-  </header>
-  <!-- End Header -->
+        <!-- Hamburger toggle (visible on mobile only) -->
+        <button class="hamburger" id="hamburger" aria-label="Toggle navigation">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="nav-links" id="nav-links">
+          <a href="index.html">Home</a>
+          <a href="shop-details.html">Shop</a>
+          <a href="deals.html">Deals</a>
+          <a href="#">Contact</a>
+        </div>
+
+        <div class="support">
+          <i class="fas fa-headset"></i>
+          <span>24/7 Support: +212 600 000 000</span>
+        </div>
+      </nav>
+    </header>
+    <!-- End Header -->
 
     <main>
       <!-- add cart to  -->
       <section>
         <div class="carts">
           <h2 class="cart-title">Your Cart</h2>
-          <div class="cart-content">
-            
-          </div>
+          <p class="cart-content"></p>
           <div class="total">
             <div class="total-title">Total</div>
             <div class="total-price">$0</div>
@@ -84,6 +97,7 @@
           </div>
         </div>
       </section>
+
       <div class="container">
         <div id="loader">Loading product...</div>
 
@@ -98,19 +112,24 @@
 
           <!-- Right Details -->
           <div class="product-info">
-            <span class="brand-name" id="p-brand"></span>
-            <h1 id="p-name"></h1>
-            <p class="desc" id="p-desc"></p>
+            <h2 id="p-name"></h2>
+
+            <div class="brand_div">
+              <span class="brand-title">Brand</span>
+              <span class="brand-namee" id="p-brand"></span>
+
+            </div>
+
             <div class="price" id="p-price"></div>
             <button class="btn-cart">Add to card</button>
           </div>
         </div>
+        <h3 class="full_name" id="full_name"></h3>
+        <p class="desc" id="p-desc"></p>
       </div>
 
       <section class="tech-collection Ecran">
-        <div class="product-grid">
-          <!-- CARD -->
-        </div>
+        <div class="product-grid"></div>
       </section>
 
       <!-- delivery -->

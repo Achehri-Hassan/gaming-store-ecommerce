@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
 
 *{
      font-family: 'Poppins', sans-serif;
-}
+} */
+
 
 .footer {
    
@@ -33,10 +34,12 @@
 }
 
 .description, .hours, .footer-section p {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.6;
-    color: var(--black);
+    color: #333;
     margin-bottom: 15px;
+    font-weight: 700;
+    
 }
 
 /* Contact Info */

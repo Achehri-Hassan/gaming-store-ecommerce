@@ -13,8 +13,6 @@
 
 
 
-
-
 :root {
     --primary: #1a3fb5;
     --bg-gray: #f8f9fa;
@@ -38,8 +36,8 @@
 }
 
 .thumb-list img {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     object-fit: contain;
     border: 1px solid #ddd;
     cursor: pointer;
@@ -65,38 +63,70 @@
 }
 
 .product-info {
-    padding-left: 20px;
+  
+    padding: 35px;
+}
+
+.product-info h2{
+     color: var(--primary);
+}
+
+
+.brand_div{
+     padding-top: 20px;
+     padding-bottom: 20px;
+}
+
+.brand-title{
+     color: #666;
+     font-size: 15px;
+     font-weight: 600;
 }
 
 .brand-name {
-    color: var(--primary);
+    color: var(--bg-gray);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
+    margin-left: 20px;
+    background-color: var(--green);
+    font-size: 18px;
+    padding: 0.5rem 40px;
+    border-radius: 5px;
+
 }
 
-h1 {
-    font-size: 2.2rem;
-    margin: 10px 0;
+
+
+
+.full_name{
+      margin-top: 20px;
+     font-size: 1.5rem;
+     margin-left: 15px;
+     color: var(--primary);
 }
 
 .desc {
-    color: #666;
+    color:var(--black);
     line-height: 1.6;
-    margin: 25px 0;
+   margin-left: 15px;
+   margin-top: 14px;
+   font-weight: 500;
+    
 }
 
 .price {
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 800;
     margin-bottom: 30px;
+    color: var(--price);
 }
 
 .btn-cart {
     background: var(--primary);
-    color: white;
+    color: var(--bg-gray);
     border: none;
-    padding: 15px 45px;
+    padding: 13px 25px;
     font-size: 1rem;
     font-weight: 600;
     border-radius: 6px;
@@ -106,11 +136,13 @@ h1 {
 @media (max-width: 900px) {
     .product-page {
         grid-template-columns: 1fr;
+        
     }
 
     .thumb-list {
         flex-direction: row;
         order: 2;
+       margin-bottom: 40px;
     }
 }
 

@@ -46,6 +46,7 @@ function displayProduct(p) {
   document.getElementById("p-name").innerText = p.name;
   document.getElementById("p-desc").innerText = p.description;
   document.getElementById("p-price").innerText = `${p.price} ${p.currency}`;
+  document.getElementById("full_name").innerHTML = p.full_title;
 
   mainImg.src = p.main_image;
 
@@ -79,7 +80,8 @@ function displayRelatedProducts(allProducts, currentId) {
         </div>
         <div class="p-details">
           <span class="p-brand">${p.brand}</span>
-          <h3>${p.name}</h3>
+          <h3 class="full_name">${p.name}</h3>
+        
           <div class="p-shop">
             <div class="p-price">${p.price} ${p.currency}</div>
             <i class="fa-solid fa-bag-shopping"></i>
