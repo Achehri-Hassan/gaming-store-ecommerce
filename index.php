@@ -139,7 +139,7 @@ $products = selectGroupedByCategory();
         <div class="swiper chair-swiper">
           <div class="swiper-wrapper">
             <?php foreach ($products['chair'] ?? [] as $product): ?>
-              <?php include __DIR__ . '/views/partials/product_card.php'; ?>
+              <?php include __DIR__ . '/src/views/partials/product_card.php'; ?>
             <?php endforeach; ?>
           </div>
         </div>
@@ -155,7 +155,7 @@ $products = selectGroupedByCategory();
     <div class="product-grid swiper desk-swiper">
       <div class="swiper-wrapper">
         <?php foreach ($products['desk'] ?? [] as $product): ?>
-          <?php include __DIR__ . '/views/partials/product_card.php'; ?>
+          <?php include __DIR__ . '/src/views/partials/product_card.php'; ?>
         <?php endforeach; ?>
       </div>
     </div>
@@ -169,7 +169,7 @@ $products = selectGroupedByCategory();
     <div class="product-grid swiper controller-swiper">
       <div class="swiper-wrapper">
         <?php foreach ($products['controller'] ?? [] as $product): ?>
-          <?php include __DIR__ . '/views/partials/product_card.php'; ?>
+          <?php include __DIR__ . '/src/views/partials/product_card.php'; ?>
         <?php endforeach; ?>
       </div>
     </div>
@@ -183,7 +183,7 @@ $products = selectGroupedByCategory();
     <div class="product-grid swiper playstation-swiper">
       <div class="swiper-wrapper">
         <?php foreach ($products['playstation'] ?? [] as $product): ?>
-          <?php include __DIR__ . '/views/partials/product_card.php'; ?>
+          <?php include __DIR__ . '/src/views/partials/product_card.php'; ?>
         <?php endforeach; ?>
       </div>
     </div>
@@ -201,7 +201,7 @@ $products = selectGroupedByCategory();
     <div class="product-grid swiper mous-swiper">
       <div class="swiper-wrapper">
         <?php foreach ($products['mouse'] ?? [] as $product): ?>
-          <?php include __DIR__ . '/views/partials/product_card.php'; ?>
+          <?php include __DIR__ . '/src/views/partials/product_card.php'; ?>
         <?php endforeach; ?>
       </div>
     </div>
@@ -219,7 +219,7 @@ $products = selectGroupedByCategory();
     <div class="product-grid swiper ecran-swiper">
       <div class="swiper-wrapper">
         <?php foreach ($products['ecran'] ?? [] as $product): ?>
-          <?php include __DIR__ . '/views/partials/product_card.php'; ?>
+          <?php include __DIR__ . '/src/views/partials/product_card.php'; ?>
         <?php endforeach; ?>
       </div>
     </div>
