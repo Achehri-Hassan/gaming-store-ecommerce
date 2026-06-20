@@ -20,11 +20,6 @@ navLinks.querySelectorAll("a").forEach((link) => {
 
 
 
-
-
-
-
-
 let cartIcon = document.querySelector("#cart");
 let cart = document.querySelector(".carts");
 let cartClose = document.querySelector("#cart-close");

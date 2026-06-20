@@ -83,7 +83,7 @@
      font-weight: 600;
 }
 
-.brand-name {
+.brand-namee {
     color: var(--bg-gray);
     font-weight: 700;
     text-transform: uppercase;
@@ -101,7 +101,7 @@
 
 .full_name{
       margin-top: 20px;
-     font-size: 1.5rem;
+     font-size: 1.8rem;
      margin-left: 15px;
      color: var(--primary);
 }

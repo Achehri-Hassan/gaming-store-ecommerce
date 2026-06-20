@@ -1,0 +1,35 @@
+
+
+
+create database gaming_store;
+
+use gaming_store ;
+
+
+
+CREATE TABLE products (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  brand VARCHAR(100) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  full_title VARCHAR(255),
+  slug VARCHAR(255) UNIQUE,
+  price DECIMAL(10,2) NOT NULL,
+  currency VARCHAR(10) DEFAULT 'DH',
+  status VARCHAR(50) DEFAULT 'In Stock',
+  main_image VARCHAR(255) NOT NULL,
+  description TEXT,
+  is_active TINYINT(1) DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE product_gallery (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  product_id INT UNSIGNED NOT NULL,
+  image_path VARCHAR(255) NOT NULL,
+  sort_order TINYINT UNSIGNED DEFAULT 0,
+  FOREIGN KEY (product_id)
+  REFERENCES products(id)
+  ON DELETE CASCADE
+);
