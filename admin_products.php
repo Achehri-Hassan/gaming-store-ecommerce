@@ -114,9 +114,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
     $img_stmt = $conn->prepare("SELECT main_image, hover_image FROM products WHERE id = :id");
     $img_stmt->execute([':id' => $id]);
     $old_images = $img_stmt->fetch();
-    
-    $main_image = uploadProductImage($_FILES['main_image'], $category) ?: $old_images['main_image'];
-    $hover_image = uploadProductImage($_FILES['hover_image'], $category) ?: $old_images['hover_image'];
+
+    // ── Upload new images (returns filename or null if no new file) ──
+    $new_main  = uploadProductImage($_FILES['main_image'],  $category);
+    $new_hover = uploadProductImage($_FILES['hover_image'], $category);
+
+    // ── Decide final filenames: new upload wins, else keep old ──
+    $main_image  = $new_main  ?: $old_images['main_image'];
+    $hover_image = $new_hover ?: $old_images['hover_image'];
 
     if ($id > 0 && !empty($name) && !empty($price)) {
         $stmt = $conn->prepare("UPDATE products SET name = :name, brand = :brand, description = :description, price = :price, category = :category, main_image = :main_image, hover_image = :hover_image WHERE id = :id");
@@ -133,6 +138,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
         ]);
 
         if ($success) {
+
+            // ── Delete OLD image files if they were replaced ──
+            $folders = [
+                'chair'       => 'src/assets/products/chair/chair_home/',
+                'desk'        => 'src/assets/products/desk/desk_home/',
+                'controller'  => 'src/assets/products/controllers/controllers_home/',
+                'playstation' => 'src/assets/products/PlayStation/playStation_home/',
+                'mouse'       => 'src/assets/products/mous/mous_home/',
+                'ecran'       => 'src/assets/products/ecran/ecran_home/',
+                'keyboard'    => 'src/assets/products/keyboard/',
+                'headset'     => 'src/assets/products/headset/',
+            ];
+            $folder = $folders[$category] ?? null;
+
+            if ($folder) {
+                if ($new_main && !empty($old_images['main_image'])) {
+                    $old_main_path = $folder . $old_images['main_image'];
+                    if (file_exists($old_main_path)) unlink($old_main_path);
+                }
+                if ($new_hover && !empty($old_images['hover_image'])) {
+                    $old_hover_path = $folder . $old_images['hover_image'];
+                    if (file_exists($old_hover_path)) unlink($old_hover_path);
+                }
+            }
+
             header("Location: admin_products.php?cat=$category&success=Product Updated Successfully");
             exit;
         } else {
@@ -148,9 +178,47 @@ if (isset($_GET['delete'])) {
     $id_to_delete = intval($_GET['delete']);
 
     if ($id_to_delete > 0) {
-        $stmt = $conn->prepare("DELETE FROM products WHERE id = :id");
-        if ($stmt->execute([':id' => $id_to_delete])) {
-            header("Location: admin_products.php?cat=$current_category&success=Deleted successfully");
+
+        // ── Step 1: Fetch image filenames + category BEFORE deleting ──
+        $img_stmt = $conn->prepare("SELECT main_image, hover_image, category FROM products WHERE id = :id");
+        $img_stmt->execute([':id' => $id_to_delete]);
+        $product_to_delete = $img_stmt->fetch();
+
+        // ── Step 2: Delete the DB record ──
+        $del_stmt = $conn->prepare("DELETE FROM products WHERE id = :id");
+        if ($del_stmt->execute([':id' => $id_to_delete])) {
+
+            // ── Step 3: Remove image files from server ──
+            if ($product_to_delete) {
+                $cat = $product_to_delete['category'];
+
+                $folders = [
+                    'chair'       => 'src/assets/products/chair/chair_home/',
+                    'desk'        => 'src/assets/products/desk/desk_home/',
+                    'controller'  => 'src/assets/products/controllers/controllers_home/',
+                    'playstation' => 'src/assets/products/PlayStation/playStation_home/',
+                    'mouse'       => 'src/assets/products/mous/mous_home/',
+                    'ecran'       => 'src/assets/products/ecran/ecran_home/',
+                    'keyboard'    => 'src/assets/products/keyboard/',
+                    'headset'     => 'src/assets/products/headset/',
+                ];
+
+                $folder = $folders[$cat] ?? null;
+
+                if ($folder) {
+                    $main_file  = $folder . $product_to_delete['main_image'];
+                    $hover_file = $folder . $product_to_delete['hover_image'];
+
+                    if (!empty($product_to_delete['main_image']) && file_exists($main_file)) {
+                        unlink($main_file);
+                    }
+                    if (!empty($product_to_delete['hover_image']) && file_exists($hover_file)) {
+                        unlink($hover_file);
+                    }
+                }
+            }
+
+            header("Location: admin_products.php?cat=$current_category&success=Product deleted and images removed successfully");
             exit;
         }
     }

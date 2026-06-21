@@ -222,3 +222,16 @@ INSERT INTO product_gallery (product_id, image_path, image_type, sort_order) VAL
 (28, 'shop_desk27.webp','shop', 1);
 
 
+ALTER TABLE products ADD COLUMN hover_image VARCHAR(255) NULL AFTER main_image;
+ALTER TABLE products ADD COLUMN stock INT DEFAULT 10 AFTER price;
+
+
+INSERT INTO users (id, username , email, password , role) VALUES (
+  2,
+   "admin",
+  'Hassanadmin@gmail.com',
+  '$2b$12$JF5C8FCg/8A900PaEirbQOHISV/zDPAJh2nieEUlSU4pCBqnIcb3G',
+  "admin"
+);
+
+-- cood admin 1234
