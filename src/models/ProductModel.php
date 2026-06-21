@@ -3,12 +3,6 @@
 
 require_once __DIR__ . '/../config/connection.php';
 
-// ──────────────────────────────────────────────────────────────
-// selectAll()
-// BUG FIX: Removed the inner subquery for MIN(sort_order).
-// A simple JOIN ON image_type = 'home' is enough — each product
-// has only ONE home image, so no MIN() logic is needed.
-// ──────────────────────────────────────────────────────────────
 function selectAll(): array {
     $conn = getConnection();
 
@@ -23,22 +17,19 @@ function selectAll(): array {
             p.currency,
             p.status,
             p.main_image,
-            g.image_path AS hover_image
+            COALESCE(NULLIF(p.hover_image, ''), g.image_path) AS hover_image
         FROM products p
         LEFT JOIN product_gallery g
             ON g.product_id = p.id
             AND g.image_type = 'home'
         WHERE p.is_active = 1
-        ORDER BY p.id ASC
+        ORDER BY p.id DESC
     ";
 
     return $conn->query($sql)->fetchAll();
 }
 
-// ──────────────────────────────────────────────────────────────
-// selectByCategory($category)
-// Fetch products for ONE category — used on shop.php
-// ──────────────────────────────────────────────────────────────
+
 function selectByCategory(string $category): array {
     $conn = getConnection();
 
