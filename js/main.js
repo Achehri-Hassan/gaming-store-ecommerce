@@ -9,13 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartContent = document.querySelector('.cart-content');
     const totalPriceEl = document.querySelector('.total-price');
 
-    // Toggle Cart Visibility
+  
     if (cartIcon && cartContainer && cartCloseBtn) {
         cartIcon.addEventListener('click', () => cartContainer.classList.add('active'));
         cartCloseBtn.addEventListener('click', () => cartContainer.classList.remove('active'));
     }
 
-    // Load Cart on page load
+    
     fetchCart({ action: 'get' });
 
     // Global click listener for structural delegation (Dynamic buttons)
@@ -28,13 +28,12 @@ document.addEventListener('DOMContentLoaded', () => {
             cartContainer.classList.add('active');
         }
 
-        // Remove item entirely via trash icon
+       
         if (e.target.classList.contains('cart-remove-item')) {
             const productId = e.target.getAttribute('data-id');
             fetchCart({ action: 'remove', product_id: productId });
         }
 
-        // 🟢 الـ Plus Button (+) وسط السلة
         if (e.target.classList.contains('cart-qty-plus')) {
             const productId = e.target.getAttribute('data-id');
             const currentQty = parseInt(e.target.getAttribute('data-qty'));
@@ -45,11 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // 🟢 الـ Minus Button (-) وسط السلة
+       
         if (e.target.classList.contains('cart-qty-minus')) {
             const productId = e.target.getAttribute('data-id');
             const currentQty = parseInt(e.target.getAttribute('data-qty'));
-            // يلا كانت الكمية 1 وبرك على ناقص، غاتحيد من السلة
+            
             fetchCart({ 
                 action: 'update_quantity', 
                 product_id: productId, 
@@ -59,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         if (cartContainer.classList.contains('active')) {
-            // يلا كليكا خارج الـ .carts و ماشي على أيقونة السلة (لي كتفتحها) و ماشي على زر add to cart
+          
             if (!cartContainer.contains(e.target) && 
                 !cartIcon.contains(e.target) && 
                 !e.target.classList.contains('add-to-cart-btn')) {
@@ -69,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Core function to interact with PHP backend
+  
     function fetchCart(data) {
         fetch('cart-handler.php', {
             method: 'POST',
@@ -85,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(err => console.error('Error handling cart transaction:', err));
     }
 
-    // Function to render the new state into HTML dynamically
+  
     function updateCartUI(cart, totalItems, totalPrice) {
         if (cartBadge) cartBadge.textContent = totalItems;
         if (totalPriceEl) totalPriceEl.textContent = totalPrice;

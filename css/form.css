@@ -115,3 +115,15 @@ body {
     font-size: 16px;
     margin-top: 10px;
 }
+
+.don_have_account{
+     text-align: center;
+}
+
+.don_have_account p{
+     color: var(--black);
+}
+
+.don_have_account p a{
+    color: var(  --second-color);
+}
