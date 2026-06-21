@@ -3,6 +3,40 @@
 
 require_once __DIR__ . '/../config/connection.php';
 
+// ──────────────────────────────────────────────────────────────
+// selectAll()
+// BUG FIX: Removed the inner subquery for MIN(sort_order).
+// A simple JOIN ON image_type = 'home' is enough — each product
+// has only ONE home image, so no MIN() logic is needed.
+// ──────────────────────────────────────────────────────────────
+// function selectAll(): array {
+//     $conn = getConnection();
+
+//     $sql = "
+//         SELECT
+//             p.id,
+//             p.category,
+//             p.brand,
+//             p.name,
+//             p.slug,
+//             p.price,
+//             p.currency,
+//             p.status,
+//             p.main_image,
+//             g.image_path AS hover_image
+//         FROM products p
+//         LEFT JOIN product_gallery g
+//             ON g.product_id = p.id
+//             AND g.image_type = 'home'
+//         WHERE p.is_active = 1
+//         ORDER BY p.id ASC
+//     ";
+
+//     return $conn->query($sql)->fetchAll();
+// }
+
+
+
 function selectAll(): array {
     $conn = getConnection();
 
@@ -29,7 +63,10 @@ function selectAll(): array {
     return $conn->query($sql)->fetchAll();
 }
 
-
+// ──────────────────────────────────────────────────────────────
+// selectByCategory($category)
+// Fetch products for ONE category — used on shop.php
+// ──────────────────────────────────────────────────────────────
 function selectByCategory(string $category): array {
     $conn = getConnection();
 
