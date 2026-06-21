@@ -3,14 +3,13 @@
    
 
 
-@import url(/css_/components/stracture.css);
-@import url(/css_/components/variables.css);
-@import url(/css_/components/header.css);
-@import url(/css_/components/cart.css);
-@import url(/css_/components/card_products.css);
-@import url(/css_/components/delevry.css);
-@import url(/css_/components/footer.css);
-
+@import url(components/stracture.css);
+@import url(components/variables.css);
+@import url(components/header.css);
+@import url(components/cart.css);
+@import url(components/card_products.css);
+@import url(components/delevry.css);
+@import url(components/footer.css);
 
 
 :root {

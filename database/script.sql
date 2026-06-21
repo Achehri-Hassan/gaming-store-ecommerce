@@ -7,52 +7,41 @@ DROP DATABASE IF EXISTS gaming_store;
 CREATE DATABASE gaming_store CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE gaming_store;
 
--- -----------------------------------------------------------
--- BUG #1 FIX: products table was MISSING the `category` column
--- The PHP code uses $product['category'] everywhere but it
--- never existed in the original schema — nothing would render!
--- -----------------------------------------------------------
+
 CREATE TABLE products (
-  id          INT UNSIGNED     AUTO_INCREMENT PRIMARY KEY,
-  category    VARCHAR(50)      NOT NULL,                     -- ✅ ADDED (was missing!)
-  brand       VARCHAR(100)     NOT NULL,
-  name        VARCHAR(255)     NOT NULL,
+  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  category    VARCHAR(50)  NOT NULL,                    
+  brand       VARCHAR(100) NOT NULL,
+  name        VARCHAR(255) NOT NULL,
   full_title  VARCHAR(255),
-  slug        VARCHAR(255)     UNIQUE,
-  price       DECIMAL(10,2)    NOT NULL,
-  currency    VARCHAR(10)      DEFAULT 'DH',
-  status      VARCHAR(50)      DEFAULT 'In Stock',
-  main_image  VARCHAR(255)     NOT NULL,
+  slug        VARCHAR(255)  UNIQUE,
+  price       DECIMAL(10,2) NOT NULL,
+  currency    VARCHAR(10)   DEFAULT 'DH',
+  status      VARCHAR(50)   DEFAULT 'In Stock',
+  main_image  VARCHAR(255)  NOT NULL,
   description TEXT,
-  is_active   TINYINT(1)       DEFAULT 1,
-  created_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP,
-  updated_at  TIMESTAMP        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  is_active   TINYINT(1) DEFAULT 1,
+  created_at  TIMESTAMP  DEFAULT CURRENT_TIMESTAMP,
+  updated_at  TIMESTAMP  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   INDEX idx_category   (category),
   INDEX idx_active     (is_active),
   INDEX idx_cat_active (category, is_active)
 );
 
--- -----------------------------------------------------------
--- BUG #2 FIX: product_gallery was MISSING the `image_type` column
--- The PHP JOIN uses image_type = 'home' / 'shop' — without this
--- column, EVERY query returns 0 results (no images, blank page).
--- -----------------------------------------------------------
+
 CREATE TABLE product_gallery (
-  id          INT UNSIGNED     AUTO_INCREMENT PRIMARY KEY,
-  product_id  INT UNSIGNED     NOT NULL,
-  image_path  VARCHAR(255)     NOT NULL,
-  image_type  ENUM('home','shop','extra') NOT NULL DEFAULT 'home', -- ✅ ADDED
+  id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  product_id  INT UNSIGNED NOT NULL,
+  image_path  VARCHAR(255) NOT NULL,
+  image_type  ENUM('home','shop','extra') NOT NULL DEFAULT 'home',
   sort_order  TINYINT UNSIGNED DEFAULT 0,
 
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
   INDEX idx_product_type (product_id, image_type)
 );
 
--- -----------------------------------------------------------
--- PRODUCTS — now with correct category values
--- BUG #3 FIX: INSERT had no `category` column in the list
--- -----------------------------------------------------------
+
 INSERT INTO products (id, category, brand, name, full_title, slug, price, currency, status, main_image, description) VALUES
 
 -- CHAIRS (category = 'chair')
@@ -96,15 +85,7 @@ INSERT INTO products (id, category, brand, name, full_title, slug, price, curren
 (28, 'ecran', 'AOC', "AOC C27G4H 27' 180Hz 0.5ms FHD Curved", "AOC C27G4H 27inch 180Hz Curved", 'aoc-c27g4h-27-180hz-0-5ms-fhd-curved', 1549.00, 'DH', 'In Stock', 'ecran-7.webp', 'The AOC C27G4H 27 180Hz 0.5ms FHD Morocco redefines immersive gaming standards.');
 
 
--- -----------------------------------------------------------
--- GALLERY — BUG #4 FIX:
--- Original sort_order used 1,2,3 but the JOIN was checking = 0
--- Now using image_type column ('home' or 'shop') instead of LIKE
---
--- RULE:
---   image_type = 'home'  → the hover image on the homepage card
---   image_type = 'shop'  → gallery images on the product detail page
--- -----------------------------------------------------------
+
 INSERT INTO product_gallery (product_id, image_path, image_type, sort_order) VALUES
 
 -- Product 1 (chair)
@@ -228,15 +209,4 @@ INSERT INTO product_gallery (product_id, image_path, image_type, sort_order) VAL
 (28, 'ecran-8.webp',   'home', 1),
 (28, 'shop_desk27.webp','shop', 1);
 
--- -----------------------------------------------------------
--- VERIFY: Quick check queries
--- -----------------------------------------------------------
--- SELECT COUNT(*) FROM products;           -- should be 28
--- SELECT COUNT(*) FROM product_gallery;    -- should be ~60
--- SELECT DISTINCT category FROM products;  -- chair, desk, controller, playstation, mouse, ecran
 
--- Test the exact JOIN used in ProductModel.php:
--- SELECT p.id, p.name, p.category, g.image_path AS hover_image
--- FROM products p
--- LEFT JOIN product_gallery g ON g.product_id = p.id AND g.image_type = 'home'
--- WHERE p.is_active = 1 ORDER BY p.id;

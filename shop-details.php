@@ -9,7 +9,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
     />
 
-    <link rel="stylesheet" href="css_/css_shop/shop.css" />
+    <link rel="stylesheet" href="../css/shop.css" />
   </head>
   <body>
     <!-- Header -->
@@ -69,7 +69,7 @@
         </button>
 
         <div class="nav-links" id="nav-links">
-          <a href="index.html">Home</a>
+          <a href="index.php">Home</a>
           <a href="shop-details.html">Shop</a>
           <a href="deals.html">Deals</a>
           <a href="#">Contact</a>

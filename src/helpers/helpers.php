@@ -20,44 +20,38 @@ function asset_url(string $category, string $slot, string $filename): string
         return '';
     }
 
-    $map = [
-
-        'chair' => [
-            'assets/products/chair/chair_home/',
-            'assets/products/chair/chair_home/',
-            'assets/products/chair/chair_shop/',
-        ],
-
-        'desk' => [
-            'assets/products/desk/desk_home/',
-            'assets/products/desk/desk_home/',
-            'assets/products/desk/desk_shop/',
-        ],
-
-        'controller' => [
-            'assets/products/controllers/controllers_home/',
-            'assets/products/controllers/controllers_home/',
-            'assets/products/controllers/controllers_shop/',
-        ],
-
-        'playstation' => [
-            'assets/products/PlayStation/playStation_home/',
-            'assets/products/PlayStation/playStation_home/',
-            'assets/products/PlayStation/playStation_shop/',
-        ],
-
-        'mouse' => [
-            'assets/products/mous/mous_home/',
-            'assets/products/mous/mous_home/',
-            'assets/products/mous/mous_shop/',
-        ],
-
-        'ecran' => [
-            'assets/products/ecran/ecran_home/',
-            'assets/products/ecran/ecran_home/',
-            'assets/products/ecran/ecran_shop/',
-        ],
-    ];
+  $map = [
+    'chair' => [
+        'src/assets/products/chair/chair_home/',
+        'src/assets/products/chair/chair_home/',
+        'src/assets/products/chair/chair_shop/',
+    ],
+    'desk' => [
+        'src/assets/products/desk/desk_home/',
+        'src/assets/products/desk/desk_home/',
+        'src/assets/products/desk/desk_shop/',
+    ],
+    'controller' => [
+        'src/assets/products/controllers/controllers_home/',
+        'src/assets/products/controllers/controllers_home/',
+        'src/assets/products/controllers/controllers_shop/',
+    ],
+    'playstation' => [
+        'src/assets/products/PlayStation/playStation_home/',
+        'src/assets/products/PlayStation/playStation_home/',
+        'src/assets/products/PlayStation/playStation_shop/',
+    ],
+    'mouse' => [
+        'src/assets/products/mous/mous_home/',
+        'src/assets/products/mous/mous_home/',
+        'src/assets/products/mous/mous_shop/',
+    ],
+    'ecran' => [
+        'src/assets/products/ecran/ecran_home/',
+        'src/assets/products/ecran/ecran_home/',
+        'src/assets/products/ecran/ecran_shop/',
+    ],
+];
 
     if (!isset($map[$category])) {
         return '';

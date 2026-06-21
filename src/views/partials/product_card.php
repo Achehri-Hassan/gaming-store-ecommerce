@@ -3,15 +3,15 @@
 /** @var array $product */
 
 $main_src = asset_url(
-    $product['category'],
-    'main',
-    $product['main_image'] ?? ''
+  $product['category'],
+  'main',
+  $product['main_image'] ?? ''
 );
 
 $hover_src = asset_url(
-    $product['category'],
-    'hover',
-    $product['hover_image'] ?? ''
+  $product['category'],
+  'hover',
+  $product['hover_image'] ?? ''
 );
 
 ?>
@@ -28,8 +28,7 @@ $hover_src = asset_url(
           src="<?= $main_src ?>"
           class="main-img"
           alt="<?= h($product['name']) ?>"
-          loading="lazy"
-        >
+          loading="lazy">
 
         <?php if (!empty($product['hover_image'])): ?>
 
@@ -37,8 +36,7 @@ $hover_src = asset_url(
             src="<?= $hover_src ?>"
             class="hover-img"
             alt="<?= h($product['name']) ?>"
-            loading="lazy"
-          >
+            loading="lazy">
 
         <?php endif; ?>
 
@@ -55,13 +53,10 @@ $hover_src = asset_url(
         </h3>
 
         <div class="p-shop">
-
           <div class="p-price">
             <?= price($product['price'], $product['currency']) ?>
           </div>
-
-          <i class="fa-solid fa-bag-shopping"></i>
-
+          <i class="fa-solid fa-bag-shopping add-to-cart-btn" data-id="<?= (int)$product['id'] ?>"></i>
         </div>
 
         <div class="p-stock">
