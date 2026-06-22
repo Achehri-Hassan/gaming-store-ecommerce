@@ -1,23 +1,17 @@
 <?php
 
-
-
 require_once __DIR__ . '/../config/connection.php';
 
-
+// ──────────────────────────────────────────────
+// selectAll()  — home page, all active products
+// ──────────────────────────────────────────────
 function selectAll(): array {
     $conn = getConnection();
 
     $sql = "
         SELECT
-            p.id,
-            p.category,
-            p.brand,
-            p.name,
-            p.slug,
-            p.price,
-            p.currency,
-            p.status,
+            p.id, p.category, p.brand, p.name, p.slug,
+            p.price, p.currency, p.status,
             p.main_image,
             COALESCE(NULLIF(p.hover_image, ''), g.image_path) AS hover_image
         FROM products p
@@ -31,22 +25,20 @@ function selectAll(): array {
     return $conn->query($sql)->fetchAll();
 }
 
-
+// ──────────────────────────────────────────────
+// selectByCategory()  — shop.php filter
+// BUG FIX: was missing COALESCE fallback to p.hover_image
+// so hover never worked on the shop/category page
+// ──────────────────────────────────────────────
 function selectByCategory(string $category): array {
     $conn = getConnection();
 
-    $sql = "
+    $stmt = $conn->prepare("
         SELECT
-            p.id,
-            p.category,
-            p.brand,
-            p.name,
-            p.slug,
-            p.price,
-            p.currency,
-            p.status,
+            p.id, p.category, p.brand, p.name, p.slug,
+            p.price, p.currency, p.status,
             p.main_image,
-            g.image_path AS hover_image
+            COALESCE(NULLIF(p.hover_image, ''), g.image_path) AS hover_image
         FROM products p
         LEFT JOIN product_gallery g
             ON g.product_id = p.id
@@ -54,32 +46,34 @@ function selectByCategory(string $category): array {
         WHERE p.is_active = 1
           AND p.category = :category
         ORDER BY p.id ASC
-    ";
-
-    $stmt = $conn->prepare($sql);
+    ");
     $stmt->execute([':category' => $category]);
     return $stmt->fetchAll();
 }
 
-
+// ──────────────────────────────────────────────
+// selectGroupedByCategory()  — index.php sections
+// ──────────────────────────────────────────────
 function selectGroupedByCategory(): array {
-    $products = selectAll();
-
     $grouped = [];
-    foreach ($products as $product) {
+    foreach (selectAll() as $product) {
         $grouped[$product['category']][] = $product;
     }
     return $grouped;
 }
 
-
-
+// ──────────────────────────────────────────────
+// selectById()  — shop-details.php
+// BUG FIX: now explicitly selects p.hover_image
+// so the related products grid also gets hover images
+// ──────────────────────────────────────────────
 function selectById(int $id): ?array {
     $conn = getConnection();
 
-    $sql = "
+    $stmt = $conn->prepare("
         SELECT
             p.*,
+            p.hover_image,
             GROUP_CONCAT(
                 g.image_path ORDER BY g.sort_order SEPARATOR '|'
             ) AS gallery_images
@@ -90,9 +84,7 @@ function selectById(int $id): ?array {
         WHERE p.id = :id
           AND p.is_active = 1
         GROUP BY p.id
-    ";
-
-    $stmt = $conn->prepare($sql);
+    ");
     $stmt->execute([':id' => $id]);
     $row = $stmt->fetch();
 

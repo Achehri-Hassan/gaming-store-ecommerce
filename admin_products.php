@@ -247,68 +247,7 @@ $products = $products_stmt->fetchAll();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Products - Tech Shop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
-    <style>
-        :root {
-            --bg-color: #0d0e12;
-            --sidebar-color: #13151b;
-            --card-color: #1f222a;
-            --neon-green: #8bfb02;
-            --text-color: #ffffff;
-            --text-muted: #aaa;
-            --border-color: #2a2e3d;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); display: flex; min-height: 100vh; }
-
-        /* Sidebar */
-        .sidebar { width: 260px; background-color: var(--sidebar-color); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px; }
-        .sidebar .logo { font-size: 20px; font-weight: 900; font-style: italic; text-transform: uppercase; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
-        .sidebar .logo span { color: var(--neon-green); }
-        .sidebar-menu { list-style: none; display: flex; flex-direction: column; gap: 10px; height: 100%; }
-        .sidebar-menu a { display: flex; align-items: center; gap: 15px; color: var(--text-muted); text-decoration: none; padding: 12px 15px; border-radius: 8px; font-size: 15px; font-weight: 600; transition: 0.3s; }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(139, 251, 2, 0.08); color: var(--neon-green); }
-        .sidebar-menu a.logout { margin-top: auto; color: #ff4d4d; }
-
-        /* Main Content */
-        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
-        .header-dash { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
-
-        /* Category Filter Tabs Navigation */
-        .category-tabs { display: flex; gap: 10px; margin-bottom: 25px; background: var(--sidebar-color); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); overflow-x: auto; }
-        .tab-btn { padding: 10px 20px; color: var(--text-muted); text-decoration: none; font-weight: bold; border-radius: 6px; font-size: 14px; transition: 0.2s; text-transform: uppercase; white-space: nowrap; }
-        .tab-btn:hover { color: white; background: rgba(255,255,255,0.02); }
-        .tab-btn.active { background: var(--neon-green); color: black; }
-
-        /* Form Controls styling */
-        .form-box { background: var(--card-color); border: 1px solid var(--border-color); padding: 25px; border-radius: 12px; margin-bottom: 40px; }
-        .form-box h2 { font-size: 18px; margin-bottom: 20px; color: var(--neon-green); display: flex; align-items: center; gap: 10px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-        .form-group { display: flex; flex-direction: column; gap: 5px; }
-        .form-group.full-width { grid-column: span 2; }
-        .form-group label { font-size: 13px; color: var(--text-muted); }
-        .form-group input, .form-group textarea, .form-group select { background: #13151b; border: 1px solid var(--border-color); padding: 10px; border-radius: 6px; color: white; outline: none; }
-        .form-group input[type="file"] { padding: 6px; }
-        .btn-submit { background: var(--neon-green); color: black; border: none; padding: 12px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; margin-top: 15px; }
-        .btn-submit:hover { background: #76d402; }
-
-        /* Interactive Table List */
-        .table-box { background: var(--card-color); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th, td { padding: 15px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
-        th { background: #13151b; color: var(--neon-green); font-weight: 600; }
-        
-        /* Containers to show image previews with a neat hover effect */
-        .img-container { display: flex; gap: 8px; }
-        .prod-img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; background: #13151b; border: 1px solid var(--border-color); transition: transform 0.2s ease; }
-        .prod-img:hover { transform: scale(1.2); border-color: var(--neon-green); z-index: 10; }
-        
-        .actions-btn { display: flex; gap: 15px; align-items: center; }
-        .btn-edit { color: #facc15; background: none; border: none; cursor: pointer; font-size: 16px; }
-        .btn-delete { color: #ff4d4d; text-decoration: none; font-size: 16px; }
-        .alert { padding: 12px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; font-size: 14px; }
-        .alert-success { background: rgba(139, 251, 2, 0.1); color: var(--neon-green); border: 1px solid var(--neon-green); }
-        .alert-danger { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; }
-    </style>
+    <link rel="stylesheet" href="css/admin_products.css">
 </head>
 <body>
 
@@ -381,7 +320,7 @@ $products = $products_stmt->fetchAll();
         </div>
 
         <div class="table-box">
-            <h3 style="padding: 15px; background: #161920; font-size: 15px; border-bottom:1px solid var(--border-color);">
+            <h3 class="item_pro">
                 Active <?= strtoupper($current_category) ?> List (<?= count($products) ?> items found)
             </h3>
             <table>

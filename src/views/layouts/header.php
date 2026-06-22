@@ -88,7 +88,7 @@
       </button>
       <div class="nav-links" id="nav-links">
         <a href="index.php">Home</a>
-        <a href="shop.php">Shop</a>
+        <a href="shop-details.php">Shop</a>
         <a href="deals.php">Deals</a>
         <a href="#">Contact</a>
       </div>
