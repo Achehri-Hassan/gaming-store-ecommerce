@@ -1,8 +1,9 @@
+
 <?php
 
 require_once 'src/config/connection.php';
 require_once 'src/helpers/helpers.php'; 
-
+require_once 'src/models/ProductModel.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -13,21 +14,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-
-$conn = getConnection();
-
 $message = '';
 $error = '';
 
-
-
 $current_category = isset($_GET['cat']) ? trim($_GET['cat']) : 'chair';
 
-
 function uploadProductImage($file, $category) {
-
     if (isset($file) && $file['error'] === UPLOAD_ERR_OK) {
-
         $fileTmpPath = $file['tmp_name'];
         $fileName = $file['name'];
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
@@ -48,7 +41,6 @@ function uploadProductImage($file, $category) {
                 mkdir($uploadFolder, 0755, true);
             }
             
-           
             $newFileName = time() . '_' . uniqid() . '.' . $fileExtension;
             $dest_path = $uploadFolder . $newFileName;
             
@@ -61,7 +53,6 @@ function uploadProductImage($file, $category) {
 }
 
 
-// ── Upload shop/gallery image to the correct *_shop/ folder ──
 function uploadShopImage($file, $category) {
     if (isset($file) && $file['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath    = $file['tmp_name'];
@@ -95,14 +86,14 @@ function uploadShopImage($file, $category) {
     return null;
 }
 
+// ── Handling ADD PRODUCT ──
+// ── Handling ADD PRODUCT ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
-
     $name = trim($_POST['name']);
     $brand = trim($_POST['brand'] ?? 'Generic');
     $description = trim($_POST['description']);
     $price = floatval($_POST['price']);
     $category = trim($_POST['category']);
-    
     
     $main_image  = uploadProductImage($_FILES['main_image'],  $category) ?? '';
     $hover_image = uploadProductImage($_FILES['hover_image'], $category) ?? '';
@@ -111,25 +102,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name))) . '-' . time();
 
     if (!empty($name) && !empty($price) && !empty($main_image)) {
-        $stmt = $conn->prepare("INSERT INTO products (category, brand, name, slug, price, main_image, hover_image, description, is_active) VALUES (:category, :brand, :name, :slug, :price, :main_image, :hover_image, :description, 1)");
         
-        $success = $stmt->execute([
-            ':category'    => $category,
-            ':brand'       => $brand,
-            ':name'        => $name,
-            ':slug'        => $slug,
-            ':price'       => $price,
-            ':main_image'  => $main_image,
-            ':hover_image' => $hover_image,
-            ':description' => $description
+      
+        $new_id = createProduct([
+            'category'    => $category,
+            'brand'       => $brand,
+            'name'        => $name,
+            'slug'        => $slug,
+            'price'       => $price,
+            'main_image'  => $main_image,
+            'hover_image' => $hover_image,
+            'description' => $description
         ]);
 
-        if ($success) {
-            // Save shop/gallery image to product_gallery if provided
+   
+        if ($new_id !== false && $new_id > 0) {
             if ($shop_image) {
-                $new_id   = $conn->lastInsertId();
-                $gal_stmt = $conn->prepare("INSERT INTO product_gallery (product_id, image_path, sort_order) VALUES (:pid, :img, 1)");
-                $gal_stmt->execute([':pid' => $new_id, ':img' => $shop_image]);
+              
+                addGalleryImage($new_id, $shop_image);
             }
             header("Location: admin_products.php?cat=$category&success=Product Added Successfully");
             exit;
@@ -141,53 +131,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     }
 }
 
-
+// ── Handling UPDATE PRODUCT ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
-
     $id = intval($_POST['id']);
     $name = trim($_POST['name']);
     $brand = trim($_POST['brand'] ?? 'Generic');
     $description = trim($_POST['description']);
     $price = floatval($_POST['price']);
     $category = trim($_POST['category']);
+
    
+    $old_product = selectById($id);
 
-    $img_stmt = $conn->prepare("SELECT main_image, hover_image FROM products WHERE id = :id");
-    $img_stmt->execute([':id' => $id]);
-    $old_images = $img_stmt->fetch();
-
-    // ── Upload new images (returns filename or null if no new file) ──
     $new_main  = uploadProductImage($_FILES['main_image'],  $category);
     $new_hover = uploadProductImage($_FILES['hover_image'], $category);
     $new_shop  = uploadShopImage($_FILES['shop_image'], $category);
 
-    // ── Decide final filenames: new upload wins, else keep old ──
-    $main_image  = $new_main  ?: $old_images['main_image'];
-    $hover_image = $new_hover ?: $old_images['hover_image'];
+    $main_image  = $new_main  ?: ($old_product ? $old_product['main_image'] : '');
+    $hover_image = $new_hover ?: ($old_product ? $old_product['hover_image'] : '');
 
     if ($id > 0 && !empty($name) && !empty($price)) {
-        $stmt = $conn->prepare("UPDATE products SET name = :name, brand = :brand, description = :description, price = :price, category = :category, main_image = :main_image, hover_image = :hover_image WHERE id = :id");
-        
-        $success = $stmt->execute([
-            ':name' => $name,
-            ':brand' => $brand,
-            ':description' => $description,
-            ':price' => $price,
-            ':category' => $category,
-            ':main_image' => $main_image,
-            ':hover_image' => $hover_image,
-            ':id' => $id
+       
+        $success = updateProduct([
+            'name'        => $name,
+            'brand'       => $brand,
+            'description' => $description,
+            'price'       => $price,
+            'category'    => $category,
+            'main_image'  => $main_image,
+            'hover_image' => $hover_image,
+            'id'          => $id
         ]);
 
         if ($success) {
-
-            // ── Save new shop/gallery image if provided ──
             if ($new_shop) {
-                $gal_stmt = $conn->prepare("INSERT INTO product_gallery (product_id, image_path, sort_order) VALUES (:pid, :img, 1)");
-                $gal_stmt->execute([':pid' => $id, ':img' => $new_shop]);
+                addGalleryImage($id, $new_shop);
             }
 
-            // ── Delete OLD image files if they were replaced ──
+            
             $folders = [
                 'chair'       => 'src/assets/products/chair/chair_home/',
                 'desk'        => 'src/assets/products/desk/desk_home/',
@@ -200,13 +181,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
             ];
             $folder = $folders[$category] ?? null;
 
-            if ($folder) {
-                if ($new_main && !empty($old_images['main_image'])) {
-                    $old_main_path = $folder . $old_images['main_image'];
+            if ($folder && $old_product) {
+                if ($new_main && !empty($old_product['main_image'])) {
+                    $old_main_path = $folder . $old_product['main_image'];
                     if (file_exists($old_main_path)) unlink($old_main_path);
                 }
-                if ($new_hover && !empty($old_images['hover_image'])) {
-                    $old_hover_path = $folder . $old_images['hover_image'];
+                if ($new_hover && !empty($old_product['hover_image'])) {
+                    $old_hover_path = $folder . $old_product['hover_image'];
                     if (file_exists($old_hover_path)) unlink($old_hover_path);
                 }
             }
@@ -219,27 +200,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
     }
 }
 
-
-
+// ── Handling DELETE PRODUCT ──
 if (isset($_GET['delete'])) {
-
     $id_to_delete = intval($_GET['delete']);
 
     if ($id_to_delete > 0) {
 
-        // ── Step 1: Fetch image filenames + category BEFORE deleting ──
-        $img_stmt = $conn->prepare("SELECT main_image, hover_image, category FROM products WHERE id = :id");
-        $img_stmt->execute([':id' => $id_to_delete]);
-        $product_to_delete = $img_stmt->fetch();
+        $product_to_delete = selectById($id_to_delete);
 
-        // ── Step 2: Delete the DB record ──
-        $del_stmt = $conn->prepare("DELETE FROM products WHERE id = :id");
-        if ($del_stmt->execute([':id' => $id_to_delete])) {
-
-            // ── Step 3: Remove image files from server ──
+        
+        if (deleteProduct($id_to_delete)) {
             if ($product_to_delete) {
                 $cat = $product_to_delete['category'];
-
                 $folders = [
                     'chair'       => 'src/assets/products/chair/chair_home/',
                     'desk'        => 'src/assets/products/desk/desk_home/',
@@ -276,17 +248,7 @@ if (isset($_GET['success'])) {
     $message = htmlspecialchars($_GET['success']);
 }
 
-
-$products_stmt = $conn->prepare("
-    SELECT p.*, COALESCE(p.hover_image, g.image_path) as calculated_hover 
-    FROM products p 
-    LEFT JOIN product_gallery g ON g.product_id = p.id
-    WHERE p.category = :category 
-    GROUP BY p.id
-    ORDER BY p.id DESC
-");
-$products_stmt->execute([':category' => $current_category]);
-$products = $products_stmt->fetchAll();
+$products = selectByCategoryForAdmin($current_category);
 ?>
 <!DOCTYPE html>
 <html lang="en">
