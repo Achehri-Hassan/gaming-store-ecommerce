@@ -61,6 +61,40 @@ function uploadProductImage($file, $category) {
 }
 
 
+// ── Upload shop/gallery image to the correct *_shop/ folder ──
+function uploadShopImage($file, $category) {
+    if (isset($file) && $file['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath    = $file['tmp_name'];
+        $fileName       = $file['name'];
+        $fileExtension  = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+
+        if (in_array($fileExtension, $allowedExtensions)) {
+            $base = 'src/assets/products/';
+            $shopFolders = [
+                'chair'       => $base . 'chair/chair_shop/',
+                'desk'        => $base . 'desk/desk_shop/',
+                'controller'  => $base . 'controllers/controllers_shop/',
+                'playstation' => $base . 'PlayStation/playStation_shop/',
+                'mouse'       => $base . 'mous/mous_shop/',
+                'ecran'       => $base . 'ecran/ecran_shop/',
+                'keyboard'    => $base . 'keyabord/',
+                'headset'     => $base . 'headset/',
+            ];
+            $uploadFolder = $shopFolders[$category] ?? null;
+            if (!$uploadFolder) return null;
+
+            if (!is_dir($uploadFolder)) mkdir($uploadFolder, 0755, true);
+
+            $newFileName = time() . '_' . uniqid() . '.' . $fileExtension;
+            if (move_uploaded_file($fileTmpPath, $uploadFolder . $newFileName)) {
+                return $newFileName;
+            }
+        }
+    }
+    return null;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
 
     $name = trim($_POST['name']);
@@ -70,26 +104,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     $category = trim($_POST['category']);
     
     
-    $main_image = uploadProductImage($_FILES['main_image'], $category) ?? '';
+    $main_image  = uploadProductImage($_FILES['main_image'],  $category) ?? '';
     $hover_image = uploadProductImage($_FILES['hover_image'], $category) ?? '';
-    
+    $shop_image  = uploadShopImage($_FILES['shop_image'],  $category);
+
     $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name))) . '-' . time();
 
     if (!empty($name) && !empty($price) && !empty($main_image)) {
         $stmt = $conn->prepare("INSERT INTO products (category, brand, name, slug, price, main_image, hover_image, description, is_active) VALUES (:category, :brand, :name, :slug, :price, :main_image, :hover_image, :description, 1)");
         
         $success = $stmt->execute([
-            ':category' => $category,
-            ':brand' => $brand,
-            ':name' => $name,
-            ':slug' => $slug,
-            ':price' => $price,
-            ':main_image' => $main_image,
+            ':category'    => $category,
+            ':brand'       => $brand,
+            ':name'        => $name,
+            ':slug'        => $slug,
+            ':price'       => $price,
+            ':main_image'  => $main_image,
             ':hover_image' => $hover_image,
             ':description' => $description
         ]);
 
         if ($success) {
+            // Save shop/gallery image to product_gallery if provided
+            if ($shop_image) {
+                $new_id   = $conn->lastInsertId();
+                $gal_stmt = $conn->prepare("INSERT INTO product_gallery (product_id, image_path, sort_order) VALUES (:pid, :img, 1)");
+                $gal_stmt->execute([':pid' => $new_id, ':img' => $shop_image]);
+            }
             header("Location: admin_products.php?cat=$category&success=Product Added Successfully");
             exit;
         } else {
@@ -118,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
     // ── Upload new images (returns filename or null if no new file) ──
     $new_main  = uploadProductImage($_FILES['main_image'],  $category);
     $new_hover = uploadProductImage($_FILES['hover_image'], $category);
+    $new_shop  = uploadShopImage($_FILES['shop_image'], $category);
 
     // ── Decide final filenames: new upload wins, else keep old ──
     $main_image  = $new_main  ?: $old_images['main_image'];
@@ -138,6 +180,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
         ]);
 
         if ($success) {
+
+            // ── Save new shop/gallery image if provided ──
+            if ($new_shop) {
+                $gal_stmt = $conn->prepare("INSERT INTO product_gallery (product_id, image_path, sort_order) VALUES (:pid, :img, 1)");
+                $gal_stmt->execute([':pid' => $id, ':img' => $new_shop]);
+            }
 
             // ── Delete OLD image files if they were replaced ──
             $folders = [
@@ -232,7 +280,7 @@ if (isset($_GET['success'])) {
 $products_stmt = $conn->prepare("
     SELECT p.*, COALESCE(p.hover_image, g.image_path) as calculated_hover 
     FROM products p 
-    LEFT JOIN product_gallery g ON g.product_id = p.id AND g.image_type = 'home'
+    LEFT JOIN product_gallery g ON g.product_id = p.id
     WHERE p.category = :category 
     GROUP BY p.id
     ORDER BY p.id DESC
@@ -309,6 +357,11 @@ $products = $products_stmt->fetchAll();
                         <input type="file" name="hover_image" id="prod-hover-img">
                         <small id="hover-img-hint" style="color:var(--neon-green); font-size:11px;"></small>
                     </div>
+                    <div class="form-group">
+                        <label>Shop Detail Image (shown on product detail page)</label>
+                        <input type="file" name="shop_image" id="prod-shop-img">
+                        <small id="shop-img-hint" style="color:var(--neon-green); font-size:11px;"></small>
+                    </div>
                     <div class="form-group full-width">
                         <label>Description</label>
                         <textarea name="description" id="prod-description" rows="2" placeholder="Describe specifications..."></textarea>
@@ -383,8 +436,9 @@ $products = $products_stmt->fetchAll();
             document.getElementById('prod-price').value = product.price;
             document.getElementById('prod-description').value = product.description;
 
-            document.getElementById('main-img-hint').innerText = "Current: " + (product.main_image ? product.main_image : 'None');
+            document.getElementById('main-img-hint').innerText  = "Current: " + (product.main_image  ? product.main_image  : 'None');
             document.getElementById('hover-img-hint').innerText = "Current: " + (product.hover_image ? product.hover_image : 'None');
+            document.getElementById('shop-img-hint').innerText  = "Leave blank to keep existing shop images.";
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -396,8 +450,9 @@ $products = $products_stmt->fetchAll();
             document.getElementById('btn-cancel').style.display = 'none';
             document.getElementById('product-form').reset();
             document.getElementById('prod-id').value = '';
-            document.getElementById('main-img-hint').innerText = "";
+            document.getElementById('main-img-hint').innerText  = "";
             document.getElementById('hover-img-hint').innerText = "";
+            document.getElementById('shop-img-hint').innerText  = "";
         });
     </script>
 </body>

@@ -5,7 +5,7 @@ require_once 'src/config/connection.php';
 require_once 'src/models/ProductModel.php';
 require_once 'src/helpers/helpers.php';
 
-// ── Get product ID from URL ──────────────────
+
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 if ($id <= 0) {
@@ -14,44 +14,36 @@ if ($id <= 0) {
 }
 
 $product = selectById($id);
+$gallery = selectProductImages($id);
+$related = selectRelated($product['category'], $id);
 
-if (!$product) {
-  header('Location: index.php');
-  exit;
-}
 
-// ── Build image list: main + gallery ─────────
-$main_src  = asset_url($product['category'], 'main',  $product['main_image']);
+$main_src  = asset_url($product['category'], 'main', $product['main_image']);
 $hover_src = asset_url($product['category'], 'hover', $product['hover_image'] ?? '');
 
-$gallery_images = [];
 
-if (!empty($product['gallery'])) {
-  foreach ($product['gallery'] as $img) {
-    $gallery_images[] = asset_url($product['category'], 'shop', $img);
-  }
+$all_thumbs = [];
+
+
+if (!empty($product['main_image'])) {
+  $all_thumbs[] = $main_src;
 }
 
-// All thumbnails: main first, then gallery
-$all_thumbs = array_filter(array_merge([$main_src, $hover_src], $gallery_images));
+
+if (!empty($product['hover_image'])) {
+  $all_thumbs[] = $hover_src;
+}
+
+
+foreach ($gallery as $img) {
+  $all_thumbs[] = asset_url($product['category'], 'shop', $img);
+}
+
 $all_thumbs = array_values(array_unique($all_thumbs));
 
-// ── Related products (same category, exclude current) ──
-$conn = getConnection();
-$rel_stmt = $conn->prepare("
-    SELECT
-        p.id, p.category, p.brand, p.name, p.slug,
-        p.price, p.currency, p.status, p.main_image,
-        COALESCE(NULLIF(p.hover_image, ''), g.image_path) AS hover_image
-    FROM products p
-    LEFT JOIN product_gallery g
-        ON g.product_id = p.id AND g.image_type = 'home'
-    WHERE p.category = :cat AND p.id != :id AND p.is_active = 1
-    ORDER BY RAND()
-    LIMIT 8
-");
-$rel_stmt->execute([':cat' => $product['category'], ':id' => $id]);
-$related = $rel_stmt->fetchAll();
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,7 +62,7 @@ $related = $rel_stmt->fetchAll();
   <?php include "src/views/layouts/header.php" ?>
 
   <!-- ═══════ CART SIDEBAR ═══════ -->
-   <?php  include "src/views/layouts/cart.php" ?>
+  <?php include "src/views/layouts/cart.php" ?>
 
   <!-- ═══════ PRODUCT DETAIL ═══════ -->
   <main>
@@ -82,10 +74,7 @@ $related = $rel_stmt->fetchAll();
         <!-- 1. Thumbnail column -->
         <div class="thumb-list">
           <?php foreach ($all_thumbs as $i => $src): ?>
-            <img
-              src="<?= h($src) ?>"
-              class="thumb <?= $i === 0 ? 'active' : '' ?>"
-              alt="Product image <?= $i + 1 ?>"
+            <img src="<?= h($src) ?>" class="thumb <?= $i === 0 ? 'active' : '' ?>" alt="Product image <?= $i + 1 ?>"
               data-src="<?= h($src) ?>">
           <?php endforeach; ?>
         </div>
@@ -204,30 +193,9 @@ $related = $rel_stmt->fetchAll();
 
 
 
-
-
-  <script>
-    // ── Thumbnail switcher ──────────────────────
-    const mainImg = document.getElementById('main-img');
-    const thumbs = document.querySelectorAll('.thumb');
-
-    thumbs.forEach(thumb => {
-      thumb.addEventListener('click', () => {
-        // Fade out
-        mainImg.classList.add('fading');
-        setTimeout(() => {
-          mainImg.src = thumb.dataset.src;
-          mainImg.classList.remove('fading');
-        }, 200);
-        // Active state
-        thumbs.forEach(t => t.classList.remove('active'));
-        thumb.classList.add('active');
-      });
-    });
-  </script>
-
   <script src="js/header.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/shop.js"></script>
+  
 </body>
-
 </html>

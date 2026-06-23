@@ -1,56 +1,56 @@
 <?php
 
 
+
+require_once 'src/models/UserModel.php';
+
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+  session_start();
 }
 
 
-require_once 'src/config/connection.php';
 
 $error = '';
 
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
 
-    if (!empty($email) && !empty($password)) {
-        $conn = getConnection();
-        
-       
-        $stmt = $conn->prepare("SELECT * FROM users WHERE email = :email");
-        $stmt->execute([':email' => $email]);
-        $user = $stmt->fetch();
+  $email = trim($_POST['email']);
+  $password = trim($_POST['password']);
 
-      
-        if ($user && password_verify($password, $user['password'])) {
-         
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
+  if (!empty($email) && !empty($password)) {
 
-         
-            if ($user['role'] === 'admin') {
-                header("Location: admin_dashboard.php");
-            } else {
-               
-                if (isset($_SESSION['redirect_to'])) {
-                    $location = $_SESSION['redirect_to'];
-                    unset($_SESSION['redirect_to']);
-                    header("Location: " . $location);
-                } else {
-                    header("Location: index.php");
-                }
-            }
-            exit;
-        } else {
-            $error = "Invalid Email or Password!";
-        }
+    $user = loginUser($email);
+
+    if ($user && password_verify($password, $user['password'])) {
+
+      // SESSION
+      $_SESSION['user_id'] = $user['id'];
+      $_SESSION['username'] = $user['username'];
+      $_SESSION['role'] = $user['role'];
+
+      // REDIRECT
+      if ($user['role'] === 'admin') {
+        header("Location: admin_dashboard.php");
+        exit;
+      }
+
+      if (isset($_SESSION['redirect_to'])) {
+        $location = $_SESSION['redirect_to'];
+        unset($_SESSION['redirect_to']);
+        header("Location: $location");
+      } else {
+        header("Location: index.php");
+      }
+      exit;
     } else {
-        $error = "All fields are required!";
+      $error = "Invalid Email or Password!";
     }
+  } else {
+    $error = "All fields are required!";
+  }
 }
+
+
 ?>
 <!doctype html>
 <html lang="en">
@@ -81,22 +81,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <h2 class="form__title">Sign In</h2>
         </div>
 
-        <?php if(!empty($error)): ?>
-            <div style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 20px; font-weight: bold;">
-                <?= $error ?>
-            </div>
+        <?php if (!empty($error)): ?>
+          <div style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 20px; font-weight: bold;">
+            <?= $error ?>
+          </div>
         <?php endif; ?>
 
         <form class="form__body" method="post">
 
           <div class="form__group">
             <label>Email</label>
-            <input type="email" placeholder="Enter your email" name="email" required/>
+            <input type="email" placeholder="Enter your email" name="email" required />
           </div>
 
           <div class="form__group">
             <label>Password</label>
-            <input type="password" placeholder="Enter your password" name="password" required/>
+            <input type="password" placeholder="Enter your password" name="password" required />
           </div>
 
           <div class="form__group">
@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
 
           <div class="don_have_account">
-             <p>Don't have an account? <a href="register.php">Create Account</a></p>
+            <p>Don't have an account? <a href="register.php">Create Account</a></p>
           </div>
 
         </form>
@@ -113,4 +113,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </main>
 
 </body>
+
 </html>

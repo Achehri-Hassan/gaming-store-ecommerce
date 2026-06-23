@@ -1,57 +1,36 @@
 <?php
 
-
-
-require_once 'src/config/connection.php';
-
-
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+  session_start();
 }
 
+require_once 'src/config/connection.php';
+require_once 'src/models/UserModel.php';
 
 $error = '';
 $success = '';
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $username = trim($_POST['name']);
   $email = trim($_POST['email']);
-  $password = $_POST['password'];
+  $password = trim($_POST['password']);
   $confirm_password = $_POST['confirm_password'];
- 
+
   if (!empty($username) && !empty($email) && !empty($password) && !empty($confirm_password)) {
 
     if ($password !== $confirm_password) {
-      $error = "Passwords do not match!";
-      
+       $error = "Passwords do not match!";
+
+    } else if (emailExists($email)) {
+      $error = "This email is already registered!";
     } else {
-      $conn = getConnection();
 
-      $stmt = $conn->prepare("SELECT id FROM users WHERE email = :email");
-      $stmt->execute([':email' => $email]);
-
-      if ($stmt->fetch()) {
-        $error = "This email is already registered!";
+      if (createUser($username, $email, $password)) {
+        $success = "Account created successfully! Redirecting to login...";
+        header("Refresh: 2; url=login.php");
       } else {
-
-        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-
-        $insert = $conn->prepare("INSERT INTO users (username, email, password, role) VALUES (:username, :email, :password, 'user')");
-
-        if ($insert->execute([
-          ':username' => $username,
-          ':email' => $email,
-          ':password' => $hashedPassword
-        ])) {
-          $success = "Account created successfully! Redirecting to login...";
-
-          header("Refresh: 2; url=login.php");
-        } else {
-          $error = "Something went wrong! Please try again.";
-        }
+        $error = "Something went wrong!";
       }
     }
   } else {
@@ -121,11 +100,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="password" placeholder="Enter your name" name="password" required />
           </div>
 
-           <div class="form__group">
+          <div class="form__group">
             <label>Confirm Password</label>
             <input type="password" placeholder="Enter your name" name="confirm_password" required />
           </div>
-          
+
           <button type="submit" class="form__button" name="Register">Submit</button>
         </form>
       </div>
