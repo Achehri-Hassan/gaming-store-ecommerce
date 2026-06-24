@@ -1,22 +1,22 @@
 <?php
-// 1. بَدْء الـ Session لتفقد بيانات المستخدم
+
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// 2. 🛡️ حماية الصفحة (Route Protection)
-// التحقق واش المستخدم مدايرش Login أولا الـ Role ديالو ماشي admin
+
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    // يلا كان زائر عادي أو مستخدم عادي، كيتمنع وكيتصيفط نيشان لصفحة الـ Login
+
     header("Location: login.php");
     exit;
 }
 
-// 3. ربط الاتصال بقاعدة البيانات لجلب الإحصائيات لاحقاً
+
 require_once 'src/config/connection.php';
 $conn = getConnection();
 
-// (اختياري) جلب إجمالي المستخدمين كـ مثال للإحصائيات
+
 $stmt = $conn->query("SELECT COUNT(*) as total_users FROM users where role = 'user' ");
 $res = $stmt->fetch();
 $total_users = $res['total_users'] ?? 0;

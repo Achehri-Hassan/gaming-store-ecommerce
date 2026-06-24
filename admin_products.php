@@ -1,8 +1,7 @@
-
 <?php
 
 require_once 'src/config/connection.php';
-require_once 'src/helpers/helpers.php'; 
+require_once 'src/helpers/helpers.php';
 require_once 'src/models/ProductModel.php';
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -19,41 +18,47 @@ $error = '';
 
 $current_category = isset($_GET['cat']) ? trim($_GET['cat']) : 'chair';
 
-function uploadProductImage($file, $category) {
+
+$baseFolders = [
+    'chair'       => 'src/assets/products/chair/chair_home/',
+    'desk'        => 'src/assets/products/desk/desk_home/',
+    'controller'  => 'src/assets/products/controllers/controllers_home/',
+    'playstation' => 'src/assets/products/PlayStation/playStation_home/',
+    'mouse'       => 'src/assets/products/mous/mous_home/',
+    'ecran'       => 'src/assets/products/ecran/ecran_home/',
+    'keyboard'    => 'src/assets/products/keyboard/',
+    'headset'     => 'src/assets/products/headset/',
+];
+
+function uploadProductImage($file, $category)
+{
+    global $baseFolders;
     if (isset($file) && $file['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath = $file['tmp_name'];
         $fileName = $file['name'];
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        
+
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
         if (in_array($fileExtension, $allowedExtensions)) {
-           
-            $uploadFolder = "src/assets/products/" . $category . "/";
-            
-            if ($category === 'chair') $uploadFolder .= "chair_home/";
-            elseif ($category === 'desk') $uploadFolder .= "desk_home/";
-            elseif ($category === 'controller') $uploadFolder .= "controllers_home/";
-            elseif ($category === 'playstation') $uploadFolder .= "playStation_home/";
-            elseif ($category === 'mouse') $uploadFolder .= "mous_home/";
-            elseif ($category === 'ecran') $uploadFolder .= "ecran_home/";
-            
+            $uploadFolder = $baseFolders[$category] ?? ("src/assets/products/" . $category . "/");
+
             if (!is_dir($uploadFolder)) {
                 mkdir($uploadFolder, 0755, true);
             }
-            
+
             $newFileName = time() . '_' . uniqid() . '.' . $fileExtension;
             $dest_path = $uploadFolder . $newFileName;
-            
+
             if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                return $newFileName; 
+                return $newFileName;
             }
         }
     }
     return null;
 }
 
-
-function uploadShopImage($file, $category) {
+function uploadShopImage($file, $category)
+{
     if (isset($file) && $file['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath    = $file['tmp_name'];
         $fileName       = $file['name'];
@@ -69,7 +74,7 @@ function uploadShopImage($file, $category) {
                 'playstation' => $base . 'PlayStation/playStation_shop/',
                 'mouse'       => $base . 'mous/mous_shop/',
                 'ecran'       => $base . 'ecran/ecran_shop/',
-                'keyboard'    => $base . 'keyabord/',
+                'keyboard'    => $base . 'keyboard/',
                 'headset'     => $base . 'headset/',
             ];
             $uploadFolder = $shopFolders[$category] ?? null;
@@ -87,14 +92,13 @@ function uploadShopImage($file, $category) {
 }
 
 // ── Handling ADD PRODUCT ──
-// ── Handling ADD PRODUCT ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     $name = trim($_POST['name']);
     $brand = trim($_POST['brand'] ?? 'Generic');
     $description = trim($_POST['description']);
     $price = floatval($_POST['price']);
     $category = trim($_POST['category']);
-    
+
     $main_image  = uploadProductImage($_FILES['main_image'],  $category) ?? '';
     $hover_image = uploadProductImage($_FILES['hover_image'], $category) ?? '';
     $shop_image  = uploadShopImage($_FILES['shop_image'],  $category);
@@ -102,8 +106,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
     $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name))) . '-' . time();
 
     if (!empty($name) && !empty($price) && !empty($main_image)) {
-        
-      
+
+
         $new_id = createProduct([
             'category'    => $category,
             'brand'       => $brand,
@@ -115,13 +119,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
             'description' => $description
         ]);
 
-   
         if ($new_id !== false && $new_id > 0) {
             if ($shop_image) {
-              
                 addGalleryImage($new_id, $shop_image);
             }
-            header("Location: admin_products.php?cat=$category&success=Product Added Successfully");
+            header("Location: admin_products.php?cat=$category");
             exit;
         } else {
             $error = "Something went wrong while adding product.";
@@ -140,7 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
     $price = floatval($_POST['price']);
     $category = trim($_POST['category']);
 
-   
     $old_product = selectById($id);
 
     $new_main  = uploadProductImage($_FILES['main_image'],  $category);
@@ -151,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
     $hover_image = $new_hover ?: ($old_product ? $old_product['hover_image'] : '');
 
     if ($id > 0 && !empty($name) && !empty($price)) {
-       
+
         $success = updateProduct([
             'name'        => $name,
             'brand'       => $brand,
@@ -168,18 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
                 addGalleryImage($id, $new_shop);
             }
 
-            
-            $folders = [
-                'chair'       => 'src/assets/products/chair/chair_home/',
-                'desk'        => 'src/assets/products/desk/desk_home/',
-                'controller'  => 'src/assets/products/controllers/controllers_home/',
-                'playstation' => 'src/assets/products/PlayStation/playStation_home/',
-                'mouse'       => 'src/assets/products/mous/mous_home/',
-                'ecran'       => 'src/assets/products/ecran/ecran_home/',
-                'keyboard'    => 'src/assets/products/keyboard/',
-                'headset'     => 'src/assets/products/headset/',
-            ];
-            $folder = $folders[$category] ?? null;
+            $folder = $baseFolders[$category] ?? null;
 
             if ($folder && $old_product) {
                 if ($new_main && !empty($old_product['main_image'])) {
@@ -192,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
                 }
             }
 
-            header("Location: admin_products.php?cat=$category&success=Product Updated Successfully");
+            header("Location: admin_products.php?cat=$category");
             exit;
         } else {
             $error = "Failed to update product.";
@@ -205,26 +195,19 @@ if (isset($_GET['delete'])) {
     $id_to_delete = intval($_GET['delete']);
 
     if ($id_to_delete > 0) {
-
         $product_to_delete = selectById($id_to_delete);
 
-        
-        if (deleteProduct($id_to_delete)) {
-            if ($product_to_delete) {
-                $cat = $product_to_delete['category'];
-                $folders = [
-                    'chair'       => 'src/assets/products/chair/chair_home/',
-                    'desk'        => 'src/assets/products/desk/desk_home/',
-                    'controller'  => 'src/assets/products/controllers/controllers_home/',
-                    'playstation' => 'src/assets/products/PlayStation/playStation_home/',
-                    'mouse'       => 'src/assets/products/mous/mous_home/',
-                    'ecran'       => 'src/assets/products/ecran/ecran_home/',
-                    'keyboard'    => 'src/assets/products/keyboard/',
-                    'headset'     => 'src/assets/products/headset/',
-                ];
+        if ($product_to_delete) {
+            $cat = $product_to_delete['category'];
 
-                $folder = $folders[$cat] ?? null;
 
+            $shop_images = selectProductImages($id_to_delete);
+
+
+            if (deleteProduct($id_to_delete)) {
+
+
+                $folder = $baseFolders[$cat] ?? null;
                 if ($folder) {
                     $main_file  = $folder . $product_to_delete['main_image'];
                     $hover_file = $folder . $product_to_delete['hover_image'];
@@ -236,10 +219,33 @@ if (isset($_GET['delete'])) {
                         unlink($hover_file);
                     }
                 }
-            }
 
-            header("Location: admin_products.php?cat=$current_category&success=Product deleted and images removed successfully");
-            exit;
+
+                $baseShop = 'src/assets/products/';
+                $shopFolders = [
+                    'chair'       => $baseShop . 'chair/chair_shop/',
+                    'desk'        => $baseShop . 'desk/desk_shop/',
+                    'controller'  => $baseShop . 'controllers/controllers_shop/',
+                    'playstation' => $baseShop . 'PlayStation/playStation_shop/',
+                    'mouse'       => $baseShop . 'mous/mous_shop/',
+                    'ecran'       => $baseShop . 'ecran/ecran_shop/',
+                    'keyboard'    => $baseShop . 'keyboard/',
+                    'headset'     => $baseShop . 'headset/',
+                ];
+
+                $shopFolder = $shopFolders[$cat] ?? null;
+                if ($shopFolder && !empty($shop_images)) {
+                    foreach ($shop_images as $img_name) {
+                        $shop_file_path = $shopFolder . $img_name;
+                        if (file_exists($shop_file_path)) {
+                            unlink($shop_file_path);
+                        }
+                    }
+                }
+
+                header("Location: admin_products.php?cat=$current_category");
+                exit;
+            }
         }
     }
 }
@@ -252,6 +258,7 @@ $products = selectByCategoryForAdmin($current_category);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -259,6 +266,7 @@ $products = selectByCategoryForAdmin($current_category);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
     <link rel="stylesheet" href="css/admin_products.css">
 </head>
+
 <body>
 
     <aside class="sidebar">
@@ -287,8 +295,8 @@ $products = selectByCategoryForAdmin($current_category);
             <a href="admin_products.php?cat=ecran" class="tab-btn <?= $current_category === 'ecran' ? 'active' : '' ?>">Écran</a>
         </div>
 
-        <?php if(!empty($message)): ?> <div class="alert alert-success"><?= $message ?></div> <?php endif; ?>
-        <?php if(!empty($error)): ?> <div class="alert alert-danger"><?= $error ?></div> <?php endif; ?>
+        <?php if (!empty($message)): ?> <div class="alert alert-success"><?= $message ?></div> <?php endif; ?>
+        <?php if (!empty($error)): ?> <div class="alert alert-danger"><?= $error ?></div> <?php endif; ?>
 
         <div class="form-box">
             <h2 id="form-title"><i class="fas fa-plus-circle"></i> Add Product to <?= strtoupper($current_category) ?></h2>
@@ -310,17 +318,17 @@ $products = selectByCategoryForAdmin($current_category);
                         <input type="number" step="0.01" name="price" id="prod-price" placeholder="2999.00" required>
                     </div>
                     <div class="form-group">
-                        <label>Main Image (Choose file from PC) *</label>
+                        <label>Main Image</label>
                         <input type="file" name="main_image" id="prod-main-img">
                         <small id="main-img-hint" style="color:var(--neon-green); font-size:11px;"></small>
                     </div>
                     <div class="form-group">
-                        <label>Hover Image (Choose file from PC)</label>
+                        <label>Hover Image</label>
                         <input type="file" name="hover_image" id="prod-hover-img">
                         <small id="hover-img-hint" style="color:var(--neon-green); font-size:11px;"></small>
                     </div>
                     <div class="form-group">
-                        <label>Shop Detail Image (shown on product detail page)</label>
+                        <label>Shop Detail Image </label>
                         <input type="file" name="shop_image" id="prod-shop-img">
                         <small id="shop-img-hint" style="color:var(--neon-green); font-size:11px;"></small>
                     </div>
@@ -341,7 +349,7 @@ $products = selectByCategoryForAdmin($current_category);
             <table>
                 <thead>
                     <tr>
-                        <th>Images (Main / Hover)</th>
+                        <th>Images</th>
                         <th>Name</th>
                         <th>Brand</th>
                         <th>Price</th>
@@ -349,15 +357,13 @@ $products = selectByCategoryForAdmin($current_category);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if(count($products) > 0): ?>
-                        <?php foreach($products as $p): 
-                            // جلب الصور عن طريق دالة asset_url الأصلية المتواجدة بملف helpers.php
+                    <?php if (count($products) > 0): ?>
+                        <?php foreach ($products as $p):
                             $main_src = asset_url($p['category'], 'main', $p['main_image']);
                             $hover_src = asset_url($p['category'], 'hover', $p['calculated_hover']);
-                            
-                            // fallback في حالة غياب مسارات الصورة
-                            if(empty($main_src)) $main_src = 'src/assets/banners_hero_section/login_woman 1.jpg';
-                            if(empty($hover_src)) $hover_src = 'src/assets/banners_hero_section/login_woman 1.jpg';
+
+                            if (empty($main_src)) $main_src = 'src/assets/banners_hero_section/login_woman 1.jpg';
+                            if (empty($hover_src)) $hover_src = 'src/assets/banners_hero_section/login_woman 1.jpg';
                         ?>
                             <tr>
                                 <td>
@@ -385,37 +391,7 @@ $products = selectByCategoryForAdmin($current_category);
         </div>
     </main>
 
-    <script>
-        function editProduct(product) {
-            document.getElementById('form-title').innerHTML = '<i class="fas fa-edit"></i> Edit Product: ' + product.name;
-            document.getElementById('btn-submit-form').name = 'update_product';
-            document.getElementById('btn-submit-form').innerText = 'Save Changes';
-            document.getElementById('btn-cancel').style.display = 'inline-block';
-
-            document.getElementById('prod-id').value = product.id;
-            document.getElementById('prod-name').value = product.name;
-            document.getElementById('prod-brand').value = product.brand;
-            document.getElementById('prod-price').value = product.price;
-            document.getElementById('prod-description').value = product.description;
-
-            document.getElementById('main-img-hint').innerText  = "Current: " + (product.main_image  ? product.main_image  : 'None');
-            document.getElementById('hover-img-hint').innerText = "Current: " + (product.hover_image ? product.hover_image : 'None');
-            document.getElementById('shop-img-hint').innerText  = "Leave blank to keep existing shop images.";
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        document.getElementById('btn-cancel').addEventListener('click', function(){
-            document.getElementById('form-title').innerHTML = '<i class="fas fa-plus-circle"></i> Add Product to <?= strtoupper($current_category) ?>';
-            document.getElementById('btn-submit-form').name = 'add_product';
-            document.getElementById('btn-submit-form').innerText = 'Add Product';
-            document.getElementById('btn-cancel').style.display = 'none';
-            document.getElementById('product-form').reset();
-            document.getElementById('prod-id').value = '';
-            document.getElementById('main-img-hint').innerText  = "";
-            document.getElementById('hover-img-hint').innerText = "";
-            document.getElementById('shop-img-hint').innerText  = "";
-        });
-    </script>
+  
+    <script src="js/handelAdminProducts"></script>
 </body>
 </html>

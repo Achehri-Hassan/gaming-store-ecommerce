@@ -1,9 +1,4 @@
-<?php
-/**
- * Reusable footer partial.
- * Include at bottom of every page:  require __DIR__ . '/src/views/layouts/footer.php';
- */
-?>
+
 
 
 <!-- ═══════════════════════ FOOTER ════════════════════════ -->

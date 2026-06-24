@@ -17,59 +17,11 @@
     <link rel="stylesheet" href="css/deails.css" />
   </head>
   <body>
+
     <!-- Header -->
-    <header class="header">
-      <div class="top-header">
-        <div class="logo">
-          <div class="logo-icon">
-            <i class="fas fa-shopping-cart"></i>
-          </div>
-          <div>
-            <h1>Tech Shop</h1>
-          </div>
-        </div>
+  
+     <?php  include "src/views/layouts/header.php" ?>
 
-        <div class="search-box">
-          <input
-            type="text"
-            placeholder="Search for latest tech, gaming gear..."
-          />
-          <button>SEARCH</button>
-        </div>
-
-        <div class="header-actions">
-          <div class="account">
-            <span>Hello, Sign in</span>
-            <div class="account-link">
-              Account & Lists <i class="fas fa-chevron-down"></i>
-            </div>
-          </div>
-
-          <div class="cart" id="cart">
-            <i class="fas fa-shopping-bag"></i>
-            <span class="cart-badge" id="cart-badge">0</span>
-          </div>
-        </div>
-      </div>
-
-      <nav class="navbar">
-        <div class="categories">
-          <i class="fas fa-bars"></i>
-          <span>Browse Categories</span>
-        </div>
-
-        <div class="nav-links">
-          <a href="index.html">Home</a>
-          <a href="shop-details.html">Shop</a>
-          <a href="#">Contact</a>
-        </div>
-
-        <div class="support">
-          <i class="fas fa-headset"></i>
-          <span>24/7 Support: +212 600 000 000</span>
-        </div>
-      </nav>
-    </header>
     <!-- End Header -->
 
     <!-- start main content -->
@@ -115,6 +67,10 @@
         </section>
       </div>
     </main>
+
+     
+     <!-- footer -->
+      <?php  include "src/views/layouts/footer.php" ?>
 
     <script src="js/header.js"></script>
   </body>

@@ -1,11 +1,3 @@
-<?php
-/**
- * Reusable header partial.
- * Include at top of every page:  require __DIR__ . '/src/views/layouts/header.php';
- *
- * Expects session to be started before including.
- */
-?>
 
 
   <header class="header">
@@ -20,17 +12,7 @@
         <input type="text" placeholder="Search for latest tech, gaming gear..." />
         <button>SEARCH</button>
       </div>
-      <!-- <div class="header-actions">
-      <div class="account">
-        <span>Hello, Sign in</span>
-        <div class="account-link">Account &amp; Lists <i class="fas fa-chevron-down"></i></div>
-      </div>
-      <div class="cart" id="cart">
-        <i class="fas fa-shopping-bag"></i>
-        <span class="cart-badge" id="cart-badge">0</span>
-      </div>
-    </div> -->
-      <div class="header-actions">
+     
 
         <div class="account">
           <?php if (isset($_SESSION['user_id'])): ?>
