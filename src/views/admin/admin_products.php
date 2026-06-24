@@ -1,8 +1,10 @@
 <?php
 
-require_once 'src/config/connection.php';
-require_once 'src/helpers/helpers.php';
-require_once 'src/models/ProductModel.php';
+require_once __DIR__ . '/../../config/connection.php';
+require_once __DIR__ . '/../../helpers/helpers.php';
+require_once __DIR__ . '/../../models/ProductModel.php';
+
+
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -264,7 +266,7 @@ $products = selectByCategoryForAdmin($current_category);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Products - Tech Shop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
-    <link rel="stylesheet" href="css/admin_products.css">
+    <link rel="stylesheet" href="/../../css/admin_products.css">
 </head>
 
 <body>

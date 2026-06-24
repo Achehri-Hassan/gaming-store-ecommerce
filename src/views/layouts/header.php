@@ -23,7 +23,7 @@
 
             <div class="account-dropdown">
               <?php if ($_SESSION['role'] === 'admin'): ?>
-                <a href="admin_dashboard.php"><i class="fas fa-user-shield"></i> Dashboard</a>
+                <a href="/../../admin/admin_dashboard.php"><i class="fas fa-user-shield"></i> Dashboard</a>
               <?php endif; ?>
               <a href="logout.php" class="logout-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>

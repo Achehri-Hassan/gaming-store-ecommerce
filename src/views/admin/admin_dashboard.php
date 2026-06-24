@@ -1,6 +1,8 @@
 <?php
 
 
+require_once __DIR__ . '/../../config/connection.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -13,7 +15,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 
-require_once 'src/config/connection.php';
+
 $conn = getConnection();
 
 
@@ -31,7 +33,7 @@ $total_users = $res['total_users'] ?? 0;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
 
     <!-- style css -->
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="/../../css/dashboard.css">
 
 </head>
 

@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       // REDIRECT
       if ($user['role'] === 'admin') {
-        header("Location: admin_dashboard.php");
+        header("Location: src/views/admin/admin_dashboard.php");
         exit;
       }
 
