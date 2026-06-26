@@ -26,7 +26,8 @@ function asset_url(string $category, string $slot, string $filename): string
     if (empty($filename)) return '';
 
     // Base path for each category
-    $base = 'src/assets/products/';
+    $base = '/src/assets/products/';
+    // $base = __DIR__ . '/src/assets/products';
 
     $map = [
         'chair'       => [
@@ -79,7 +80,7 @@ function asset_url(string $category, string $slot, string $filename): string
 
 function upload_folder(string $category): string
 {
-    $base = 'src/assets/products/';
+    $base = '/src/assets/products/';
 
     $folders = [
         'chair'       => $base . 'chair/chair_home/',

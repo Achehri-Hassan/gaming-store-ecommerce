@@ -33,7 +33,7 @@ $total_users = $res['total_users'] ?? 0;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
 
     <!-- style css -->
-    <link rel="stylesheet" href="/../../css/dashboard.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
 
 </head>
 
@@ -45,10 +45,10 @@ $total_users = $res['total_users'] ?? 0;
         </div>
         <ul class="sidebar-menu" style="height: 100%;">
             <li><a href="admin_dashboard.php" class="active"><i class="fas fa-chart-pie"></i> Overview</a></li>
-            <li><a href="admin_products.php"><i class="fas fa-box"></i> Products (CRUD)</a></li>
+            <li><a href="/src/views/admin/admin_products.php"><i class="fas fa-box"></i> Products (CRUD)</a></li>
             <li><a href="admin_orders.php"><i class="fas fa-shopping-cart"></i> Orders</a></li>
-            <li><a href="index.php"><i class="fas fa-eye"></i> View Website</a></li>
-            <li style="margin-top: auto;"><a href="logout.php" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <li><a href="../../../index.php"><i class="fas fa-eye"></i> View Website</a></li>
+            <li style="margin-top: auto;"><a href="/logout.php" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </aside>
 

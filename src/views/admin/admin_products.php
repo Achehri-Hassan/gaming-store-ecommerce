@@ -22,14 +22,14 @@ $current_category = isset($_GET['cat']) ? trim($_GET['cat']) : 'chair';
 
 
 $baseFolders = [
-    'chair'       => 'src/assets/products/chair/chair_home/',
-    'desk'        => 'src/assets/products/desk/desk_home/',
-    'controller'  => 'src/assets/products/controllers/controllers_home/',
-    'playstation' => 'src/assets/products/PlayStation/playStation_home/',
-    'mouse'       => 'src/assets/products/mous/mous_home/',
-    'ecran'       => 'src/assets/products/ecran/ecran_home/',
-    'keyboard'    => 'src/assets/products/keyboard/',
-    'headset'     => 'src/assets/products/headset/',
+    'chair'       => '/src/assets/products/chair/chair_home/',
+    'desk'        => '/src/assets/products/desk/desk_home/',
+    'controller'  => '/src/assets/products/controllers/controllers_home/',
+    'playstation' => '/src/assets/products/PlayStation/playStation_home/',
+    'mouse'       => '/src/assets/products/mous/mous_home/',
+    'ecran'       => '/src/assets/products/ecran/ecran_home/',
+    'keyboard'    => '/src/assets/products/keyboard/',
+    'headset'     => '/src/assets/products/headset/',
 ];
 
 function uploadProductImage($file, $category)
@@ -42,7 +42,7 @@ function uploadProductImage($file, $category)
 
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
         if (in_array($fileExtension, $allowedExtensions)) {
-            $uploadFolder = $baseFolders[$category] ?? ("src/assets/products/" . $category . "/");
+            $uploadFolder = $baseFolders[$category] ?? ("/src/assets/products/" . $category . "/");
 
             if (!is_dir($uploadFolder)) {
                 mkdir($uploadFolder, 0755, true);
@@ -62,6 +62,7 @@ function uploadProductImage($file, $category)
 function uploadShopImage($file, $category)
 {
     if (isset($file) && $file['error'] === UPLOAD_ERR_OK) {
+
         $fileTmpPath    = $file['tmp_name'];
         $fileName       = $file['name'];
         $fileExtension  = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
@@ -95,6 +96,7 @@ function uploadShopImage($file, $category)
 
 // ── Handling ADD PRODUCT ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
+
     $name = trim($_POST['name']);
     $brand = trim($_POST['brand'] ?? 'Generic');
     $description = trim($_POST['description']);
@@ -137,6 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
 
 // ── Handling UPDATE PRODUCT ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
+
     $id = intval($_POST['id']);
     $name = trim($_POST['name']);
     $brand = trim($_POST['brand'] ?? 'Generic');
@@ -276,8 +279,8 @@ $products = selectByCategoryForAdmin($current_category);
         <ul class="sidebar-menu">
             <li><a href="admin_dashboard.php"><i class="fas fa-chart-pie"></i> Overview</a></li>
             <li><a href="admin_products.php" class="active"><i class="fas fa-box"></i> Products (CRUD)</a></li>
-            <li><a href="index.php"><i class="fas fa-eye"></i> View Website</a></li>
-            <li style="margin-top: auto;"><a href="logout.php" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <li><a href="../../../index.php"><i class="fas fa-eye"></i> View Website</a></li>
+            <li style="margin-top: auto;"><a href="/logout.php" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </aside>
 
