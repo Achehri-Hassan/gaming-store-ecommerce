@@ -1,0 +1,20 @@
+{
+    "name": "gaming-store/app",
+    "description": "Gaming Store E-commerce — Production PHP/MySQL App",
+    "type": "project",
+    "require": {
+        "php": ">=8.1"
+    },
+    "autoload": {
+        "files": [
+            "src/config/connection.php",
+            "src/helpers/helpers.php",
+            "src/models/UserModel.php",
+            "src/models/ProductModel.php",
+            "src/models/OrderModel.php"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

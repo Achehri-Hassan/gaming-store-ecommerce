@@ -127,3 +127,7 @@ body {
 .don_have_account p a{
     color: var(  --second-color);
 }
+/* ── Alert / flash styles (used in login, register) ── */
+.alert { padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; font-size: .93rem; }
+.alert--error   { background: rgba(255,77,77,.1);  color: #ff4d4d; border: 1px solid #ff4d4d; }
+.alert--success { background: rgba(139,251,2,.1);  color: #8bfb02; border: 1px solid #8bfb02; }

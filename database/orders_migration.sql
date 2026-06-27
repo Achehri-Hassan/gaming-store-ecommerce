@@ -1,8 +1,7 @@
-
-
-
-
-
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Migration: Add orders and order_items tables
+-- Run this after the existing script.sql
+-- ─────────────────────────────────────────────────────────────────────────────
 
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -31,7 +30,6 @@ CREATE TABLE IF NOT EXISTS order_items (
     product_id INT UNSIGNED,                 
     quantity   SMALLINT UNSIGNED NOT NULL DEFAULT 1,
     price      DECIMAL(10,2) NOT NULL,      
-
     FOREIGN KEY (order_id)   REFERENCES orders(id)   ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL,
     INDEX idx_order   (order_id),

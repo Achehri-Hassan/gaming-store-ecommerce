@@ -1,11 +1,19 @@
+# Environment
 .env
 
-/vendor
+# Uploads (user content — not tracked)
+src/assets/uploads/
 
-/uploads/*
+# Dependencies
+vendor/
+node_modules/
 
-!.gitkeep
-
-/node_modules
-
+# OS / IDE
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log

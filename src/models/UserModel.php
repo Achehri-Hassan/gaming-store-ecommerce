@@ -2,11 +2,11 @@
 
 
 
-<?php 
+<?php
 
 require_once __DIR__ . '/../config/connection.php';
 
-  function loginUser(string $email): ?array
+function loginUser(string $email): ?array
 {
     $conn = getConnection();
 
@@ -25,8 +25,7 @@ function createUser(string $username, string $email, string $password): bool
 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    $stmt = $conn->prepare("
-        INSERT INTO users (username, email, password, role)
+    $stmt = $conn->prepare(" INSERT INTO users (username, email, password, role)
         VALUES (:username, :email, :password, 'user')
     ");
 
