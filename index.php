@@ -30,7 +30,7 @@ $products = selectGroupedByCategory();
 
   <!-- ═══════════════════════ HEADER ═══════════════════════ -->
 
- <?php include "src/views/layouts/header.php"; ?>
+  <?php include "src/views/layouts/header.php"; ?>
 
 
   <!-- main content -->
@@ -38,7 +38,7 @@ $products = selectGroupedByCategory();
 
     <!-- ═══════════════════════ CART ═══════════════════════ -->
     <section>
-      <?php  include "src/views/layouts/cart.php" ?>
+      <?php include "src/views/layouts/cart.php" ?>
     </section>
 
     <!-- ═══════════════════════ HERO SLIDER ════════════════ -->
@@ -79,7 +79,7 @@ $products = selectGroupedByCategory();
 
 
     <!-- products home -->
-    <section class="product-slider">
+  <section class="product-slider">
       <h2 class="slider-title">Gaming Accessories</h2>
       <div class="swiper productSwiper">
         <div class="swiper-wrapper">
@@ -160,10 +160,10 @@ $products = selectGroupedByCategory();
         </div>
       </div>
 
-    </section>
+  </section>
 
     <!-- ═══════════════════ CHAIR SECTION ══════════════════ -->
-    <section class="tech-collection" id="chair-section">
+  <section class="tech-collection" id="chair-section">
       <div class="collection-container">
         <div class="collection-info">
           <h2>OUR COLLECTION OF DEVICES</h2>
@@ -188,11 +188,11 @@ $products = selectGroupedByCategory();
           </div>
         </div>
       </div>
-    </section>
+  </section>
 
 
     <!-- ═══════════════════ DESK SECTION ═══════════════════ -->
-    <section class="tech-collection desks" id="desk-section">
+  <section class="tech-collection desks" id="desk-section">
       <div class="section-header">
         <h2 class="section-title">DISCOVER OUR GAMING DESk</h2>
 
@@ -215,14 +215,12 @@ $products = selectGroupedByCategory();
         </div>
 
       </div>
-    </section>
+  </section>
 
 
 
     <!-- ════════════════ CONTROLLERS SECTION ═══════════════ -->
-
-
-    <section class="tech-collection controllers" id="controllers-section">
+  <section class="tech-collection controllers" id="controllers-section">
       <div class="section-header">
         <h2 class="section-title">ULTIMATE GRAPHICS POWER</h2>
 
@@ -243,10 +241,10 @@ $products = selectGroupedByCategory();
           <?php endforeach; ?>
         </div>
       </div>
-    </section>
+  </section>
 
     <!-- ═══════════════ PLAYSTATION SECTION ════════════════ -->
-    <section class="tech-collection" id="playStation-section">
+  <section class="tech-collection" id="playStation-section">
       <div class="section-header nj">
         <h2 class="section-title">PLAYSTATION GAMING</h2>
       </div>
@@ -257,10 +255,10 @@ $products = selectGroupedByCategory();
           <?php endforeach; ?>
         </div>
       </div>
-    </section>
+  </section>
 
     <!-- ════════════════ MOUSE SECTION ═════════════════════ -->
-    <section class="tech-collection mous" id="mous-section">
+  <section class="tech-collection mous" id="mous-section">
       <div class="section-header nj">
         <h2 class="section-title">ULTIMATE MOUSE POWER</h2>
         <div class="section-controls mous_button">
@@ -275,10 +273,10 @@ $products = selectGroupedByCategory();
           <?php endforeach; ?>
         </div>
       </div>
-    </section>
+  </section>
 
     <!-- ════════════════ ECRAN SECTION ═════════════════════ -->
-    <section class="tech-collection Ecran" id="ecran-section">
+  <section class="tech-collection Ecran" id="ecran-section">
       <div class="section-header nj">
         <h2 class="section-title">ULTIMATE GRAPHICS POWER</h2>
         <div class="section-controls ecran_button">
@@ -293,10 +291,10 @@ $products = selectGroupedByCategory();
           <?php endforeach; ?>
         </div>
       </div>
-    </section>
+  </section>
 
     <!-- ════════════════ FEATURES BAR ══════════════════════ -->
-    <section class="features-container">
+  <section class="features-container">
       <div class="card card-blue">
         <div class="icon-section"><i class="fa-solid fa-truck-fast"></i></div>
         <div class="text-section">
@@ -318,7 +316,7 @@ $products = selectGroupedByCategory();
           <p>We are at your service all week</p>
         </div>
       </div>
-    </section>
+  </section>
 
   </main>
 

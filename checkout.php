@@ -54,6 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($items)) {
+            // تشييك واش الطلب جاي بـ AJAX
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                echo json_encode(['success' => false, 'errors' => ['Cart is empty or products are unavailable.']]);
+                exit;
+            }
             flash('error', 'Cart is empty or products are unavailable.');
             header('Location: checkout.php');
             exit;
@@ -73,14 +78,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             createOrderItems($orderId, $items);
             $conn->commit();
 
-            // ── Clear cart, show success ───────────────────────────────────────
+            // ── Clear cart ───────────────────────────────────────
             $_SESSION['cart'] = [];
+
+            // إيلا كان الطلب داز بـ AJAX، كنرجعو JSON للمودال بلا ما يوقع ريفريش
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                echo json_encode([
+                    'success' => true,
+                    'order_id' => $orderId,
+                    'customer_name' => $name,
+                    'phone' => $phone,
+                    'city' => $city,
+                    'address' => $address,
+                    'total_price' => price($total)
+                ]);
+                exit;
+            }
+
             flash('success', "Order #$orderId placed successfully! We will contact you shortly.");
             header('Location: order-success.php?id=' . $orderId);
             exit;
         } catch (Exception $e) {
             $conn->rollBack();
+
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                echo json_encode(['success' => false, 'errors' => ['Something went wrong placing your order. Please try again.']]);
+                exit;
+            }
             $errors[] = 'Something went wrong placing your order. Please try again.';
+        }
+    } else {
+        // إيلا كانو أخطاء ديال الـ Validation فـ طلب الـ AJAX
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            echo json_encode(['success' => false, 'errors' => $errors]);
+            exit;
         }
     }
 }
@@ -110,6 +141,8 @@ foreach ($_SESSION['cart'] as $item) {
 
     <?php include 'src/views/layouts/header.php'; ?>
 
+    <?php include "src/views/layouts/cart.php" ?>
+
     <main class="checkout-page">
         <div class="checkout-container">
 
@@ -119,6 +152,12 @@ foreach ($_SESSION['cart'] as $item) {
             </div>
 
             <?= render_flash() ?>
+
+
+            <div id="ajaxErrorContainer" class="alert alert--error" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <ul id="ajaxErrorList"></ul>
+            </div>
 
             <?php if (!empty($errors)): ?>
                 <div class="alert alert--error">
@@ -133,7 +172,7 @@ foreach ($_SESSION['cart'] as $item) {
 
             <div class="checkout-grid">
 
-                <!-- ── Shipping Form ─────────────────────────────────────────────── -->
+
                 <section class="checkout-form-section">
                     <h2 class="section-heading"><i class="fas fa-map-marker-alt"></i> Delivery Information</h2>
 
@@ -142,12 +181,9 @@ foreach ($_SESSION['cart'] as $item) {
 
                         <div class="form-group">
                             <label for="customer_name">Full Name <span class="required">*</span></label>
-                            <input
-                                type="text"
-                                id="customer_name"
-                                name="customer_name"
-                                placeholder="e.g. Hassan Alaoui"
-                                value="<?= h($_POST['customer_name'] ?? '') ?>"
+                            <input type="text" id="customer_name" name="customer_name"
+                                placeholder="name"
+                                value="<?= h($_SESSION['username'] ?? '') ?>"
                                 required>
                         </div>
 
@@ -195,9 +231,8 @@ foreach ($_SESSION['cart'] as $item) {
                     </form>
                 </section>
 
-                <!-- ── Order Summary ─────────────────────────────────────────────── -->
+
                 <aside class="order-summary">
-                    
 
                     <?php if (empty($cartItems)): ?>
                         <div class="empty-state">
@@ -240,23 +275,33 @@ foreach ($_SESSION['cart'] as $item) {
                         </div>
                     <?php endif; ?>
 
-        
                 </aside>
 
-            </div><!-- .checkout-grid -->
+            </div>
         </div>
     </main>
 
     <?php include 'src/views/layouts/footer.php'; ?>
 
-    <script>
-        // Prevent double-submit
-        document.getElementById('checkoutForm').addEventListener('submit', function() {
-            const btn = document.getElementById('placeOrderBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order…';
-        });
-    </script>
+
+    <div id="successModal" class="order-success-modal">
+        <div class="success-modal-content animate-pop">
+
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>Order Confirmed!</h1>
+            <p>Thank you, <strong id="modalCustomerName"></strong>. Your order has been placed successfully.</p>
+            <p class="order-ref">Order #<strong id="modalOrderId"></strong></p>
+
+            <div class="modal-progress-bar"></div>
+        </div>
+    </div>
+
+   
+    <script src="js/order.js"></script>
+    <script src="js/header.js"></script>
+    <script src="js/main.js"></script>
 
 </body>
 

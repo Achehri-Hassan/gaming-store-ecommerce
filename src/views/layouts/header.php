@@ -1,8 +1,11 @@
 <?php
+
+
 // Ensure CSRF token exists before rendering the header meta tag
 require_once __DIR__ . '/../../helpers/helpers.php';
 $csrfToken = csrf_token();
 ?>
+
 <!-- CSRF token for JavaScript (cart AJAX, etc.) -->
 <meta name="csrf-token" content="<?= h($csrfToken) ?>">
 
@@ -17,7 +20,7 @@ $csrfToken = csrf_token();
     <div class="search-box">
       <form method="GET" action="shop-details.php" style="display:contents">
         <input type="text" name="q" placeholder="Search for latest tech, gaming gear…"
-               value="<?= h($_GET['q'] ?? '') ?>">
+          value="<?= h($_GET['q'] ?? '') ?>">
         <button type="submit">SEARCH</button>
       </form>
     </div>
@@ -49,10 +52,10 @@ $csrfToken = csrf_token();
     </div>
 
     <div class="cart" id="cart">
-      <a href="/checkout.php" style="color:inherit;text-decoration:none">
+  
         <i class="fas fa-shopping-bag"></i>
         <span class="cart-badge" id="cart-badge">0</span>
-      </a>
+  
     </div>
   </div>
 

@@ -15,6 +15,8 @@
         <div class="total-title">Total</div>
         <div class="total-price">0 DH</div>
       </div>
-      <button type="button" class="btn-buy">Checkout</button>
+      <a href="/checkout.php" style="color:inherit;text-decoration:none">
+       <button type="button" class="btn-buy">Checkout</button>
+     </a>
     </div>
 </div>
