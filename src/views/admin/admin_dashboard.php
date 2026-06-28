@@ -81,10 +81,6 @@ $stats          = getOrderStats();
         </div>
     </div>
 
-    <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap">
-        <a href="admin_products.php" class="btn btn--primary"><i class="fas fa-plus"></i> Add Product</a>
-        <a href="admin_orders.php" class="btn btn--secondary"><i class="fas fa-list"></i> View Orders</a>
-    </div>
 </main>
 
 </body>

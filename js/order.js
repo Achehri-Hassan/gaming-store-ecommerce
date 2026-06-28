@@ -28,12 +28,11 @@ document.getElementById("checkoutForm") .addEventListener("submit", function (e)
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          // تعبئة البيانات
+        
           document.getElementById("modalCustomerName").innerText =
             data.customer_name;
           document.getElementById("modalOrderId").innerText = data.order_id;
 
-          // إظهار الـ Modal
           const modal = document.getElementById("successModal");
           modal.style.display = "flex";
           setTimeout(() => {
