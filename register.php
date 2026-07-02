@@ -35,8 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'This email is already registered.';
     } else {
         if (createUser($username, $email, $password)) {
-            $success = 'Account created successfully! Redirecting to login…';
-            header('Refresh: 2; url=login.php');
+            header('Location: login.php');
         } else {
             $error = 'Something went wrong. Please try again.';
         }

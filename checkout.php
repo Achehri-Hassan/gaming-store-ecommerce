@@ -16,11 +16,7 @@ if (empty($_SESSION['user_id'])) {
 }
 
 // Cart must not be empty
-if (empty($_SESSION['cart'])) {
-    flash('info', 'Your cart is empty. Add products before checking out.');
-    header('Location: index.php');
-    exit;
-}
+
 
 $errors = [];
 

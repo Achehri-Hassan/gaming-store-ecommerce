@@ -10,16 +10,6 @@ require_admin();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
 
-    // Update status
-    if (isset($_POST['update_status'])) {
-        $id     = (int) $_POST['order_id'];
-        $status = clean($_POST['status'] ?? '');
-        updateOrderStatus($id, $status)
-            ? flash('success', "Order #$id status updated to " . ucfirst($status) . '.')
-            : flash('error', 'Failed to update status.');
-    }
-
-    // Delete order
     if (isset($_POST['delete_order'])) {
         $id = (int) $_POST['order_id'];
         deleteOrder($id)
@@ -33,23 +23,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // ── Filters & Pagination ──────────────────────────────────────────────────────
 $search      = clean($_GET['search'] ?? '');
-$statusFilter = clean($_GET['status'] ?? '');
 $currentPage = max(1, (int) ($_GET['page'] ?? 1));
 $perPage     = 15;
 
-$total   = countAllOrders($search, $statusFilter);
+$total   = countUniqueCustomers($search);
 $pager   = paginate($total, $perPage, $currentPage);
-$orders  = getAllOrders($search, $statusFilter, $perPage, $pager['offset']);
+$customers = getUniqueCustomers($search, $perPage, $pager['offset']);
 $stats   = getOrderStats();
-
-$statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders — Admin Panel</title>
+    <title>Customers Orders — Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/admin_orders.css">
@@ -69,7 +56,7 @@ $statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 
 <main class="main-content">
     <div class="header-dash">
-        <h1><i class="fas fa-shopping-cart"></i> Orders Management</h1>
+        <h1><i class="fas fa-shopping-cart"></i> Customers Management</h1>
         <div class="admin-profile">
             <i class="fas fa-user-shield"></i>
             <span>Admin: <strong><?= h($_SESSION['username']) ?></strong></span>
@@ -78,112 +65,69 @@ $statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 
     <?= render_flash() ?>
 
-    <!-- ── Stats Bar ────────────────────────────────────────────────────────── -->
     <div class="cards-grid" style="margin-bottom:24px">
         <div class="card">
             <div class="card-info"><h3>Total Orders</h3><p><?= number_format((int)$stats['total_orders']) ?></p></div>
             <div class="card-icon"><i class="fas fa-shopping-bag"></i></div>
         </div>
         <div class="card">
-            <div class="card-info"><h3>Revenue</h3><p><?= price((float)$stats['total_revenue']) ?></p></div>
+            <div class="card-info"><h3>Total Revenue</h3><p><?= price((float)$stats['total_revenue']) ?></p></div>
             <div class="card-icon"><i class="fas fa-coins"></i></div>
-        </div>
-        <div class="card">
-            <div class="card-info"><h3>Pending</h3><p><?= (int)$stats['pending'] ?></p></div>
-            <div class="card-icon"><i class="fas fa-clock"></i></div>
-        </div>
-        <div class="card">
-            <div class="card-info"><h3>Delivered</h3><p><?= (int)$stats['delivered'] ?></p></div>
-            <div class="card-icon"><i class="fas fa-check-circle"></i></div>
         </div>
     </div>
 
-    <!-- ── Search & Filter ──────────────────────────────────────────────────── -->
     <form method="GET" action="admin_orders.php" class="filter-bar">
         <input
             type="text"
             name="search"
-            placeholder="Search by name, phone, city or ID…"
+            placeholder="Search by customer name, phone or city…"
             value="<?= h($search) ?>"
             class="filter-input"
+            style="width: 100%; max-width: 400px;"
         >
-        <select name="status" class="filter-select">
-            <option value="">All Statuses</option>
-            <?php foreach ($statuses as $s): ?>
-                <option value="<?= h($s) ?>" <?= $statusFilter === $s ? 'selected' : '' ?>>
-                    <?= h(ucfirst($s)) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        <button type="submit" class="btn btn--primary"><i class="fas fa-search"></i> Filter</button>
-        <?php if ($search || $statusFilter): ?>
+        <button type="submit" class="btn btn--primary"><i class="fas fa-search"></i> Search</button>
+        <?php if ($search): ?>
             <a href="admin_orders.php" class="btn btn--secondary"><i class="fas fa-times"></i> Clear</a>
         <?php endif; ?>
     </form>
 
-    <!-- ── Orders Table ──────────────────────────────────────────────────────── -->
-    <?php if (empty($orders)): ?>
+    <?php if (empty($customers)): ?>
         <div class="empty-state">
             <i class="fas fa-inbox"></i>
-            <p>No orders found<?= $search || $statusFilter ? ' matching your filters.' : ' yet.' ?></p>
+            <p>No customers found.</p>
         </div>
     <?php else: ?>
         <div class="table-wrapper">
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>#ID</th>
-                        <th>Customer</th>
+                        <th>Customer Name</th>
                         <th>Phone</th>
                         <th>City</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Date</th>
+                        <th>Total Spent</th>
+                        <th>Last Activity</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($orders as $order): ?>
+                    <?php foreach ($customers as $client): ?>
                         <tr>
-                            <td><strong>#<?= (int)$order['id'] ?></strong></td>
-                            <td>
-                                <div><?= h($order['customer_name']) ?></div>
-                                <small style="color:#aaa"><?= h($order['email'] ?? '') ?></small>
-                            </td>
-                            <td><?= h($order['phone']) ?></td>
-                            <td><?= h($order['city']) ?></td>
-                            <td><strong><?= price((float)$order['total_price']) ?></strong></td>
-                            <td>
-                                <span class="status-badge status-badge--<?= h($order['status']) ?>">
-                                    <?= h(ucfirst($order['status'])) ?>
-                                </span>
-                            </td>
-                            <td><?= h(date('d M Y', strtotime($order['created_at']))) ?></td>
+                            <td><strong><?= h($client['customer_name']) ?></strong></td>
+                            <td><?= h($client['phone']) ?></td>
+                            <td><?= h($client['city']) ?></td>
+                            <td><strong><?= price((float)$client['total_price']) ?></strong></td>
+                            <td><?= h(date('d M Y', strtotime($client['created_at']))) ?></td>
                             <td class="actions-cell">
                                 <button
                                     class="btn btn--icon btn--view"
-                                    onclick="openOrderModal(<?= (int)$order['id'] ?>)"
-                                    title="View Details"
+                                    onclick="openCustomerPurchasesModal(<?= (int)$client['user_id'] ?>, '<?= h($client['customer_name']) ?>')"
+                                    title="View Customer Purchases"
                                 ><i class="fas fa-eye"></i></button>
 
-                                <!-- Quick-status form -->
-                                <form method="POST" action="admin_orders.php" style="display:inline">
-                                    <?= csrf_field() ?>
-                                    <input type="hidden" name="order_id" value="<?= (int)$order['id'] ?>">
-                                    <select name="status" class="quick-status" onchange="this.form.submit()">
-                                        <?php foreach ($statuses as $s): ?>
-                                            <option value="<?= h($s) ?>" <?= $order['status'] === $s ? 'selected' : '' ?>>
-                                                <?= h(ucfirst($s)) ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <input type="hidden" name="update_status" value="1">
-                                </form>
-
                                 <form method="POST" action="admin_orders.php" style="display:inline"
-                                      onsubmit="return confirm('Delete order #<?= (int)$order['id'] ?>? This cannot be undone.')">
+                                      onsubmit="return confirm('Delete records for this client?')">
                                     <?= csrf_field() ?>
-                                    <input type="hidden" name="order_id" value="<?= (int)$order['id'] ?>">
+                                    <input type="hidden" name="order_id" value="<?= (int)$client['id'] ?>">
                                     <input type="hidden" name="delete_order" value="1">
                                     <button type="submit" class="btn btn--icon btn--danger" title="Delete">
                                         <i class="fas fa-trash"></i>
@@ -196,11 +140,10 @@ $statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
             </table>
         </div>
 
-        <!-- ── Pagination ──────────────────────────────────────────────────── -->
         <?php if ($pager['total_pages'] > 1): ?>
             <div class="pagination">
                 <?php
-                $qs = http_build_query(array_filter(['search' => $search, 'status' => $statusFilter]));
+                $qs = http_build_query(array_filter(['search' => $search]));
                 $base = 'admin_orders.php?' . ($qs ? $qs . '&' : '');
                 ?>
                 <?php if ($pager['has_prev']): ?>
@@ -219,11 +162,10 @@ $statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
     <?php endif; ?>
 </main>
 
-<!-- ── Order Detail Modal ────────────────────────────────────────────────────── -->
 <div class="modal-overlay" id="orderModalOverlay" onclick="closeOrderModal()"></div>
 <div class="modal" id="orderModal">
     <div class="modal-header">
-        <h3 id="modalTitle">Order Details</h3>
+        <h3 id="modalTitle">Customer Purchases</h3>
         <button class="modal-close" onclick="closeOrderModal()">&times;</button>
     </div>
     <div class="modal-body" id="modalBody">
@@ -232,16 +174,17 @@ $statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 </div>
 
 <script>
-function openOrderModal(id) {
+function openCustomerPurchasesModal(userId, name) {
     document.getElementById('orderModalOverlay').classList.add('active');
     document.getElementById('orderModal').classList.add('active');
-    document.getElementById('modalTitle').textContent = 'Order #' + id;
-    document.getElementById('modalBody').innerHTML = '<p style="text-align:center"><i class="fas fa-spinner fa-spin"></i> Loading…</p>';
+    document.getElementById('modalTitle').textContent = 'Purchases by ' + name;
+    document.getElementById('modalBody').innerHTML = '<p style="text-align:center"><i class="fas fa-spinner fa-spin"></i> Fetching client history…</p>';
 
-    fetch('admin_order_detail.php?id=' + id)
+    // هنا نقوم باستدعاء ملف تفاصيل المنتجات التي اشتراها بالكامل
+    fetch('admin_order_detail.php?user_id=' + userId)
         .then(r => r.text())
         .then(html => { document.getElementById('modalBody').innerHTML = html; })
-        .catch(() => { document.getElementById('modalBody').innerHTML = '<p>Failed to load order details.</p>'; });
+        .catch(() => { document.getElementById('modalBody').innerHTML = '<p>Failed to load customer details.</p>'; });
 }
 
 function closeOrderModal() {

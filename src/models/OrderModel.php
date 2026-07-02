@@ -207,3 +207,106 @@ function getOrderStats(): array
     ")->fetch();
     return $row ?: ['total_orders' => 0, 'total_revenue' => 0, 'pending' => 0, 'delivered' => 0];
 }
+
+
+
+/**
+ * الحصول على جميع المنتجات التي تم شراؤها في تاريخ محدد
+ * 
+ * @param int $userId
+ * @param string $date (Format: Y-m-d)
+ * @return array
+ */
+function getProductsByOrderDate(int $userId, string $date): array
+{
+    $conn = getConnection(); //[cite: 1]
+    
+    // query كتجيب كاع المنتجات ديال هاد النهار فجدول واحد ديريكت
+    $stmt = $conn->prepare("
+        SELECT 
+            oi.quantity,
+            oi.price AS purchased_price,
+            p.name AS product_name,
+            p.main_image,
+            p.category,
+            o.id AS order_id,
+            o.status,
+            o.created_at
+        FROM order_items oi
+        INNER JOIN orders o ON o.id = oi.order_id
+        LEFT JOIN products p ON p.id = oi.product_id
+        WHERE o.user_id = :user_id 
+          AND DATE(o.created_at) = :order_date
+        ORDER BY o.created_at DESC
+    ");
+    
+    $stmt->execute([
+        ':user_id'    => $userId,
+        ':order_date' => $date
+    ]);
+    
+    return $stmt->fetchAll();
+}
+
+
+/**
+ * جلب المستخدمين الفريدين الذين قاموا بطلبات بدون تكرار الاسم
+ */
+function getUniqueCustomers(string $search = '', int $limit = 20, int $offset = 0): array
+{
+    $conn   = getConnection();
+    $where  = [];
+    $params = [];
+
+    if ($search !== '') {
+        $where[]           = '(customer_name LIKE :search OR phone LIKE :search OR city LIKE :search)';
+        $params[':search'] = '%' . $search . '%';
+    }
+
+    $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+    $stmt = $conn->prepare("
+        SELECT 
+            MIN(id) AS id,
+            user_id,
+            customer_name,
+            phone,
+            city,
+            MAX(created_at) AS created_at,
+            SUM(total_price) AS total_price,
+            'pending' AS status
+        FROM orders
+        {$whereClause}
+        GROUP BY user_id, customer_name, phone, city
+        ORDER BY created_at DESC
+        LIMIT :limit OFFSET :offset
+    ");
+
+    foreach ($params as $key => $val) {
+        $stmt->bindValue($key, $val);
+    }
+    $stmt->bindValue(':limit',  $limit,  PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
+/**
+ * حساب عدد المستخدمين الفريدين للـ Pagination
+ */
+function countUniqueCustomers(string $search = ''): int
+{
+    $conn   = getConnection();
+    $params = [];
+    $where  = '';
+
+    if ($search !== '') {
+        $where             = 'WHERE (customer_name LIKE :search OR phone LIKE :search OR city LIKE :search)';
+        $params[':search'] = '%' . $search . '%';
+    }
+
+    $stmt = $conn->prepare("SELECT COUNT(DISTINCT user_id, customer_name) FROM orders {$where}");
+    $stmt->execute($params);
+    return (int) $stmt->fetchColumn();
+}

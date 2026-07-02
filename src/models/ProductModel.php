@@ -171,8 +171,7 @@ function deleteProduct(int $id): bool
 function addGalleryImage(int $productId, string $image): bool
 {
     $conn = getConnection();
-    $stmt = $conn->prepare("
-        INSERT INTO product_gallery (product_id, image_path, sort_order)
+    $stmt = $conn->prepare(" INSERT INTO product_gallery (product_id, image_path, sort_order)
         VALUES (:product_id, :image, 1)
     ");
     return $stmt->execute([':product_id' => $productId, ':image' => $image]);
