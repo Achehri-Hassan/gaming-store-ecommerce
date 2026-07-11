@@ -131,8 +131,7 @@ function countAllOrders(string $search = '', string $status = ''): int
 function getOrderById(int $id): ?array
 {
     $conn = getConnection();
-    $stmt = $conn->prepare("
-        SELECT o.*, u.username, u.email
+    $stmt = $conn->prepare(" SELECT o.*, u.username, u.email
         FROM orders o
         LEFT JOIN users u ON u.id = o.user_id
         WHERE o.id = :id
@@ -145,8 +144,7 @@ function getOrderById(int $id): ?array
 function getUserOrders(int $userId): array
 {
     $conn = getConnection();
-    $stmt = $conn->prepare("
-        SELECT * FROM orders
+    $stmt = $conn->prepare(" SELECT * FROM orders
         WHERE user_id = :user_id
         ORDER BY created_at DESC
     ");
@@ -158,8 +156,7 @@ function getUserOrders(int $userId): array
 function getOrderItems(int $orderId): array
 {
     $conn = getConnection();
-    $stmt = $conn->prepare("
-        SELECT oi.*, p.name AS product_name, p.main_image, p.category
+    $stmt = $conn->prepare(" SELECT oi.*, p.name AS product_name, p.main_image, p.category
         FROM order_items oi
         LEFT JOIN products p ON p.id = oi.product_id
         WHERE oi.order_id = :order_id
@@ -197,9 +194,7 @@ function deleteOrder(int $id): bool
 function getOrderStats(): array
 {
     $conn = getConnection();
-    $row  = $conn->query("
-        SELECT
-            COUNT(*) AS total_orders,
+    $row  = $conn->query(" SELECT COUNT(*) AS total_orders,
             COALESCE(SUM(total_price), 0) AS total_revenue,
             SUM(status = 'pending')   AS pending,
             SUM(status = 'delivered') AS delivered
@@ -222,8 +217,7 @@ function getProductsByOrderDate(int $userId, string $date): array
     $conn = getConnection(); //[cite: 1]
     
     // query كتجيب كاع المنتجات ديال هاد النهار فجدول واحد ديريكت
-    $stmt = $conn->prepare("
-        SELECT 
+    $stmt = $conn->prepare(" SELECT 
             oi.quantity,
             oi.price AS purchased_price,
             p.name AS product_name,
@@ -250,6 +244,53 @@ function getProductsByOrderDate(int $userId, string $date): array
 
 
 /**
+ * الحصول على جميع المنتجات المشتراة بين تاريخين (Date Range).
+ * إذا كان $from أو $to فارغين (null) كنرجعو كاع الطلبيات بلا حدود.
+ *
+ * @param int         $userId
+ * @param string|null $from   (Format: Y-m-d) or null for no lower bound
+ * @param string|null $to     (Format: Y-m-d) or null for no upper bound
+ * @return array
+ */
+function getProductsByOrderDateRange(int $userId, ?string $from, ?string $to): array
+{
+    $conn   = getConnection();
+    $where  = ['o.user_id = :user_id'];
+    $params = [':user_id' => $userId];
+
+    if ($from !== null && $from !== '') {
+        $where[]              = 'DATE(o.created_at) >= :from_date';
+        $params[':from_date'] = $from;
+    }
+    if ($to !== null && $to !== '') {
+        $where[]            = 'DATE(o.created_at) <= :to_date';
+        $params[':to_date'] = $to;
+    }
+
+    $whereClause = 'WHERE ' . implode(' AND ', $where);
+
+    $stmt = $conn->prepare(" SELECT
+            oi.quantity,
+            oi.price AS purchased_price,
+            p.name AS product_name,
+            p.main_image,
+            p.category,
+            o.id AS order_id,
+            o.status,
+            o.created_at,
+            o.total_price
+        FROM order_items oi
+        INNER JOIN orders o ON o.id = oi.order_id
+        LEFT JOIN products p ON p.id = oi.product_id
+        {$whereClause}
+        ORDER BY o.created_at DESC, o.id DESC
+    ");
+
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
+
+/**
  * جلب المستخدمين الفريدين الذين قاموا بطلبات بدون تكرار الاسم
  */
 function getUniqueCustomers(string $search = '', int $limit = 20, int $offset = 0): array
@@ -265,8 +306,7 @@ function getUniqueCustomers(string $search = '', int $limit = 20, int $offset = 
 
     $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
-    $stmt = $conn->prepare("
-        SELECT 
+    $stmt = $conn->prepare(" SELECT 
             MIN(id) AS id,
             user_id,
             customer_name,

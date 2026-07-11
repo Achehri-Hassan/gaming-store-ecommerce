@@ -196,6 +196,7 @@ $all_thumbs = array_values(array_unique($all_thumbs));
   <script src="js/header.js"></script>
   <script src="js/main.js"></script>
   <script src="js/shop.js"></script>
-  
+
 </body>
+
 </html>

@@ -57,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -64,51 +65,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="css/form.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 </head>
-<body>
-<main>
-    <section class="contact-container">
-        <div class="contact__image">
-            <img src="src/assets/banners_hero_section/pexels-yankrukov-9072299.jpg" alt="Gaming">
-            <h2 class="image-overlay-text">Welcome Back</h2>
-        </div>
 
-        <div class="contact__form-section" style="margin-top:50px">
-            <div class="form__header">
-                <h2 class="form__title">Sign In</h2>
+<body>
+    <main>
+        <section class="contact-container">
+            <div class="contact__image">
+                <img src="src/assets/banners_hero_section/pexels-yankrukov-9072299.jpg" alt="Gaming">
+                <h2 class="image-overlay-text">Welcome Back</h2>
             </div>
 
-            <?php if ($error): ?>
-                <div class="alert alert--error"><?= h($error) ?></div>
-            <?php endif; ?>
-
-            <form class="form__body" method="POST" action="login.php">
-                <?= csrf_field() ?>
-
-                <div class="form__group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email"
-                           placeholder="Enter your email"
-                           value="<?= h($_POST['email'] ?? '') ?>"
-                           required autocomplete="email">
+            <div class="contact__form-section" style="margin-top:50px">
+                <div class="form__header">
+                    <h2 class="form__title">Sign In</h2>
                 </div>
 
-                <div class="form__group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password"
-                           placeholder="Enter your password"
-                           required autocomplete="current-password">
-                </div>
+                <?php if ($error): ?>
+                    <div class="alert alert--error"><?= h($error) ?></div>
+                <?php endif; ?>
 
-                <div class="form__group">
-                    <button type="submit" class="form__button">Login</button>
-                </div>
+                <form class="form__body" method="POST" action="login.php">
+                    <?= csrf_field() ?>
 
-                <div class="don_have_account">
-                    <p>Don't have an account? <a href="register.php">Create Account</a></p>
-                </div>
-            </form>
-        </div>
-    </section>
-</main>
+                    <div class="form__group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email"
+                            placeholder="Enter your email"
+                            value="<?= h($_POST['email'] ?? '') ?>"
+                            required autocomplete="email">
+                    </div>
+
+                    <div class="form__group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password"
+                            placeholder="Enter your password"
+                            required autocomplete="current-password">
+                    </div>
+
+                    <div class="form__group">
+                        <button type="submit" class="form__button">Login</button>
+                    </div>
+
+                    <div class="don_have_account">
+                        <p>Don't have an account? <a href="register.php">Create Account</a></p>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
 </body>
+
 </html>
