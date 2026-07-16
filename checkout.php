@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($items)) {
-            // تشييك واش الطلب جاي بـ AJAX
+         
             if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
                 echo json_encode(['success' => false, 'errors' => ['Cart is empty or products are unavailable.']]);
                 exit;
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // ── Clear cart ───────────────────────────────────────
             $_SESSION['cart'] = [];
 
-            // إيلا كان الطلب داز بـ AJAX، كنرجعو JSON للمودال بلا ما يوقع ريفريش
+         
             if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
                 echo json_encode([
                     'success' => true,
@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Something went wrong placing your order. Please try again.';
         }
     } else {
-        // إيلا كانو أخطاء ديال الـ Validation فـ طلب الـ AJAX
+      
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             echo json_encode(['success' => false, 'errors' => $errors]);
             exit;
