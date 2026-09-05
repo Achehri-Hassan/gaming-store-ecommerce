@@ -13,7 +13,7 @@ $products = selectGroupedByCategory();
 
 
 
-?>
+ ?>
 <!doctype html>
 <html lang="en">
 

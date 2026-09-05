@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($items)) {
-         
+
             if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
                 echo json_encode(['success' => false, 'errors' => ['Cart is empty or products are unavailable.']]);
                 exit;
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // ── Clear cart ───────────────────────────────────────
             $_SESSION['cart'] = [];
 
-         
+
             if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
                 echo json_encode([
                     'success' => true,
@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Something went wrong placing your order. Please try again.';
         }
     } else {
-      
+
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             echo json_encode(['success' => false, 'errors' => $errors]);
             exit;
@@ -294,7 +294,7 @@ foreach ($_SESSION['cart'] as $item) {
         </div>
     </div>
 
-   
+
     <script src="js/order.js"></script>
     <script src="js/header.js"></script>
     <script src="js/main.js"></script>

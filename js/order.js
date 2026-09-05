@@ -43,7 +43,7 @@ document.getElementById("checkoutForm") .addEventListener("submit", function (e)
             modal.classList.remove("show");
             setTimeout(() => {
               modal.style.display = "none";
-              window.location.href = "index.php";
+              window.location.href = "my-orders.php";
             }, 300);
           }, 2000);
 
