@@ -199,7 +199,7 @@ $products = selectByCategoryForAdmin($current_category);
             <li><a href="admin_dashboard.php"><i class="fas fa-chart-pie"></i> Overview</a></li>
             <li><a href="admin_products.php" class="active"><i class="fas fa-box"></i> Products (CRUD)</a></li>
             <li><a href="/index.php"><i class="fas fa-eye"></i> View Website</a></li>
-            <li style="margin-top: auto;"><a href="logout.php" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <li style="margin-top: auto;"><a href="../../../logout.php" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
         </ul>
     </aside>
 
