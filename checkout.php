@@ -35,21 +35,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strlen($city) < 2)          $errors[] = 'Please enter a valid city.';
 
     if (empty($errors)) {
-        // ── Re-verify prices from DB (never trust session prices for totals) ──
+        // ── Re-verify prices AND stock from DB (never trust the session for
+        //    either — the browser/session cart is only ever a suggestion) ──
         $total = 0;
         $items = [];
 
         foreach ($_SESSION['cart'] as $item) {
 
-            $product = selectById((int) $item['id']);
+            // Inactive/soft-deleted products are dropped silently, same as
+            // a product that no longer exists at all.
+            $product = selectActiveById((int) $item['id']);
             if (!$product) continue;
-            $qty    = max(1, (int) $item['quantity']);
+
+            $qty = max(1, (int) $item['quantity']);
+
+            if ((int) $product['stock'] < $qty) {
+                $errors[] = sprintf(
+                    'Only %d of "%s" left in stock — please update your cart.',
+                    (int) $product['stock'],
+                    $product['name']
+                );
+                continue;
+            }
+
             $price  = (float) $product['price'];
             $total += $price * $qty;
             $items[] = ['id' => $product['id'], 'price' => $price, 'quantity' => $qty];
         }
 
-        if (empty($items)) {
+        if (!empty($errors)) {
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+                echo json_encode(['success' => false, 'errors' => $errors]);
+                exit;
+            }
+            // fall through to re-render the page with $errors set
+        } elseif (empty($items)) {
 
             if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
                 echo json_encode(['success' => false, 'errors' => ['Cart is empty or products are unavailable.']]);
@@ -58,11 +78,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             flash('error', 'Cart is empty or products are unavailable.');
             header('Location: checkout.php');
             exit;
-        }
+        } else {
 
         $conn = getConnection();
         $conn->beginTransaction();
         try {
+            // Decrement stock atomically first. decrementStock() only
+            // updates the row if enough stock is still available at the
+            // moment of the UPDATE (WHERE stock >= qty), so this is safe
+            // even if another checkout happened between the check above
+            // and this point — stock can never go negative.
+            foreach ($items as $item) {
+                if (!decrementStock($item['id'], $item['quantity'])) {
+                    throw new RuntimeException('Insufficient stock for product #' . $item['id']);
+                }
+            }
+
             $orderId = createOrder(
                 (int) $_SESSION['user_id'],
                 $total,
@@ -97,12 +128,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (Exception $e) {
             $conn->rollBack();
 
+            $message = ($e instanceof RuntimeException)
+                ? 'Sorry, one of the items in your cart just sold out. Please review your cart and try again.'
+                : 'Something went wrong placing your order. Please try again.';
+
             if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-                echo json_encode(['success' => false, 'errors' => ['Something went wrong placing your order. Please try again.']]);
+                echo json_encode(['success' => false, 'errors' => [$message]]);
                 exit;
             }
-            $errors[] = 'Something went wrong placing your order. Please try again.';
+            $errors[] = $message;
         }
+
+        } // end stock-available branch
     } else {
 
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {

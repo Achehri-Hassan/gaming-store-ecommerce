@@ -4,12 +4,12 @@ require_once __DIR__ . '/../../config/connection.php';
 require_once __DIR__ . '/../../helpers/helpers.php';
 require_once __DIR__ . '/../../models/ProductModel.php';
 
-
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// require_admin() also exists in helpers.php; kept as an explicit check
+// here so a missing session/role fails closed with the same behaviour.
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header("Location: login.php");
     exit;
@@ -18,142 +18,83 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 $message = '';
 $error = '';
 
-$current_category = isset($_GET['cat']) ? trim($_GET['cat']) : 'chair';
-
-
-$baseFolders = [
-    'chair'       => 'src/assets/products/chair/chair_home/',
-    'desk'        => 'src/assets/products/desk/desk_home/',
-    'controller'  => 'src/assets/products/controllers/controllers_home/',
-    'playstation' => 'src/assets/products/PlayStation/playStation_home/',
-    'mouse'       => 'src/assets/products/mous/mous_home/',
-    'ecran'       => 'src/assets/products/ecran/ecran_home/',
-    'keyboard'    => 'src/assets/products/keyboard/',
-    'headset'     => 'src/assets/products/headset/',
-];
-
-function uploadProductImage($file, $category)
-{
-    global $baseFolders;
-    if (isset($file) && $file['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $file['tmp_name'];
-        $fileName = $file['name'];
-        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-        if (in_array($fileExtension, $allowedExtensions)) {
-            $uploadFolder = $baseFolders[$category] ?? ("src/assets/products/" . $category . "/");
-
-            if (!is_dir($uploadFolder)) {
-                mkdir($uploadFolder, 0755, true);
-            }
-
-            $newFileName = time() . '_' . uniqid() . '.' . $fileExtension;
-            $dest_path = $uploadFolder . $newFileName;
-
-            if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                return $newFileName;
-            }
-        }
-    }
-    return null;
-}
-
-function uploadShopImage($file, $category)
-{
-    if (isset($file) && $file['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath    = $file['tmp_name'];
-        $fileName       = $file['name'];
-        $fileExtension  = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-
-        if (in_array($fileExtension, $allowedExtensions)) {
-            $base = 'src/assets/products/';
-            $shopFolders = [
-                'chair'       => $base . 'chair/chair_shop/',
-                'desk'        => $base . 'desk/desk_shop/',
-                'controller'  => $base . 'controllers/controllers_shop/',
-                'playstation' => $base . 'PlayStation/playStation_shop/',
-                'mouse'       => $base . 'mous/mous_shop/',
-                'ecran'       => $base . 'ecran/ecran_shop/',
-                'keyboard'    => $base . 'keyboard/',
-                'headset'     => $base . 'headset/',
-            ];
-            $uploadFolder = $shopFolders[$category] ?? null;
-            if (!$uploadFolder) return null;
-
-            if (!is_dir($uploadFolder)) mkdir($uploadFolder, 0755, true);
-
-            $newFileName = time() . '_' . uniqid() . '.' . $fileExtension;
-            if (move_uploaded_file($fileTmpPath, $uploadFolder . $newFileName)) {
-                return $newFileName;
-            }
-        }
-    }
-    return null;
-}
+$requested_category = isset($_GET['cat']) ? trim($_GET['cat']) : 'chair';
+$current_category   = is_valid_category($requested_category) ? $requested_category : 'chair';
 
 // ── Handling ADD PRODUCT ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_product'])) {
-    $name = trim($_POST['name']);
-    $brand = trim($_POST['brand'] ?? 'Generic');
-    $description = trim($_POST['description']);
-    $price = floatval($_POST['price']);
-    $category = trim($_POST['category']);
+    verify_csrf();
 
-    $main_image  = uploadProductImage($_FILES['main_image'],  $category) ?? '';
-    $hover_image = uploadProductImage($_FILES['hover_image'], $category) ?? '';
-    $shop_image  = uploadShopImage($_FILES['shop_image'],  $category);
+    $name        = trim($_POST['name'] ?? '');
+    $brand       = trim($_POST['brand'] ?? 'Generic');
+    $description = trim($_POST['description'] ?? '');
+    $price       = filter_var($_POST['price'] ?? '', FILTER_VALIDATE_FLOAT);
+    $category    = trim($_POST['category'] ?? '');
 
-    $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name))) . '-' . time();
-
-    if (!empty($name) && !empty($price) && !empty($main_image)) {
-
-
-        $new_id = createProduct([
-            'category'    => $category,
-            'brand'       => $brand,
-            'name'        => $name,
-            'slug'        => $slug,
-            'price'       => $price,
-            'main_image'  => $main_image,
-            'hover_image' => $hover_image,
-            'description' => $description
-        ]);
-
-        if ($new_id !== false && $new_id > 0) {
-            if ($shop_image) {
-                addGalleryImage($new_id, $shop_image);
-            }
-            header("Location: admin_products.php?cat=$category");
-            exit;
-        } else {
-            $error = "Something went wrong while adding product.";
-        }
+    if (!is_valid_category($category)) {
+        $error = "Invalid product category.";
+    } elseif (empty($name) || $price === false || $price <= 0) {
+        $error = "Please fill all required fields with valid values.";
     } else {
-        $error = "Please fill all required fields and upload the Main Image.";
+        $main_image  = secure_image_upload($_FILES['main_image']  ?? [], upload_folder($category))      ?? '';
+        $hover_image = secure_image_upload($_FILES['hover_image'] ?? [], upload_folder($category))      ?? '';
+        $shop_image  = secure_image_upload($_FILES['shop_image']  ?? [], shop_upload_folder($category));
+
+        $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name))) . '-' . time();
+
+        if (empty($main_image)) {
+            $error = "Please upload a valid Main Image (jpg, jpeg, png or webp, max 2MB).";
+        } else {
+            $new_id = createProduct([
+                'category'    => $category,
+                'brand'       => $brand,
+                'name'        => $name,
+                'slug'        => $slug,
+                'price'       => $price,
+                'main_image'  => $main_image,
+                'hover_image' => $hover_image,
+                'description' => $description
+            ]);
+
+            if ($new_id !== false && $new_id > 0) {
+                if ($shop_image) {
+                    addGalleryImage($new_id, $shop_image);
+                }
+                header("Location: admin_products.php?cat=" . urlencode($category));
+                exit;
+            } else {
+                $error = "Something went wrong while adding product.";
+            }
+        }
     }
 }
 
 // ── Handling UPDATE PRODUCT ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
-    $id = intval($_POST['id']);
-    $name = trim($_POST['name']);
-    $brand = trim($_POST['brand'] ?? 'Generic');
-    $description = trim($_POST['description']);
-    $price = floatval($_POST['price']);
-    $category = trim($_POST['category']);
+    verify_csrf();
 
-    $old_product = selectById($id);
+    $id          = (int) ($_POST['id'] ?? 0);
+    $name        = trim($_POST['name'] ?? '');
+    $brand       = trim($_POST['brand'] ?? 'Generic');
+    $description = trim($_POST['description'] ?? '');
+    $price       = filter_var($_POST['price'] ?? '', FILTER_VALIDATE_FLOAT);
+    $category    = trim($_POST['category'] ?? '');
 
-    $new_main  = uploadProductImage($_FILES['main_image'],  $category);
-    $new_hover = uploadProductImage($_FILES['hover_image'], $category);
-    $new_shop  = uploadShopImage($_FILES['shop_image'], $category);
+    $old_product = $id > 0 ? selectById($id) : null;
 
-    $main_image  = $new_main  ?: ($old_product ? $old_product['main_image'] : '');
-    $hover_image = $new_hover ?: ($old_product ? $old_product['hover_image'] : '');
+    if (!$old_product) {
+        $error = "Product not found.";
+    } elseif (!is_valid_category($category)) {
+        $error = "Invalid product category.";
+    } elseif (empty($name) || $price === false || $price <= 0) {
+        $error = "Please fill all required fields with valid values.";
+    } else {
+        $new_main  = secure_image_upload($_FILES['main_image']  ?? [], upload_folder($category));
+        $new_hover = secure_image_upload($_FILES['hover_image'] ?? [], upload_folder($category));
+        $new_shop  = secure_image_upload($_FILES['shop_image']  ?? [], shop_upload_folder($category));
 
-    if ($id > 0 && !empty($name) && !empty($price)) {
+        $main_image  = $new_main  ?: $old_product['main_image'];
+        $hover_image = $new_hover ?: $old_product['hover_image'];
 
         $success = updateProduct([
             'name'        => $name,
@@ -171,20 +112,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
                 addGalleryImage($id, $new_shop);
             }
 
-            $folder = $baseFolders[$category] ?? null;
-
-            if ($folder && $old_product) {
+            // Only remove the OLD file once the new one has been safely
+            // written and the DB row updated, and only when the category
+            // (and therefore folder) hasn't changed.
+            $folder = upload_folder($old_product['category']);
+            if ($folder && $old_product['category'] === $category) {
                 if ($new_main && !empty($old_product['main_image'])) {
-                    $old_main_path = $folder . $old_product['main_image'];
-                    if (file_exists($old_main_path)) unlink($old_main_path);
+                    delete_image($folder, $old_product['main_image']);
                 }
                 if ($new_hover && !empty($old_product['hover_image'])) {
-                    $old_hover_path = $folder . $old_product['hover_image'];
-                    if (file_exists($old_hover_path)) unlink($old_hover_path);
+                    delete_image($folder, $old_product['hover_image']);
                 }
             }
 
-            header("Location: admin_products.php?cat=$category");
+            header("Location: admin_products.php?cat=" . urlencode($category));
             exit;
         } else {
             $error = "Failed to update product.";
@@ -192,9 +133,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_product'])) {
     }
 }
 
-// ── Handling DELETE PRODUCT ──
-if (isset($_GET['delete'])) {
-    $id_to_delete = intval($_GET['delete']);
+// ── Handling DELETE PRODUCT (POST-only, CSRF-protected) ──
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product'])) {
+    verify_csrf();
+
+    $id_to_delete = (int) ($_POST['id'] ?? 0);
 
     if ($id_to_delete > 0) {
         $product_to_delete = selectById($id_to_delete);
@@ -202,58 +145,37 @@ if (isset($_GET['delete'])) {
         if ($product_to_delete) {
             $cat = $product_to_delete['category'];
 
-
             $shop_images = selectProductImages($id_to_delete);
 
-
             if (deleteProduct($id_to_delete)) {
-
-
-                $folder = $baseFolders[$cat] ?? null;
+                $folder = upload_folder($cat);
                 if ($folder) {
-                    $main_file  = $folder . $product_to_delete['main_image'];
-                    $hover_file = $folder . $product_to_delete['hover_image'];
-
-                    if (!empty($product_to_delete['main_image']) && file_exists($main_file)) {
-                        unlink($main_file);
+                    if (!empty($product_to_delete['main_image'])) {
+                        delete_image($folder, $product_to_delete['main_image']);
                     }
-                    if (!empty($product_to_delete['hover_image']) && file_exists($hover_file)) {
-                        unlink($hover_file);
+                    if (!empty($product_to_delete['hover_image'])) {
+                        delete_image($folder, $product_to_delete['hover_image']);
                     }
                 }
 
-
-                $baseShop = 'src/assets/products/';
-                $shopFolders = [
-                    'chair'       => $baseShop . 'chair/chair_shop/',
-                    'desk'        => $baseShop . 'desk/desk_shop/',
-                    'controller'  => $baseShop . 'controllers/controllers_shop/',
-                    'playstation' => $baseShop . 'PlayStation/playStation_shop/',
-                    'mouse'       => $baseShop . 'mous/mous_shop/',
-                    'ecran'       => $baseShop . 'ecran/ecran_shop/',
-                    'keyboard'    => $baseShop . 'keyboard/',
-                    'headset'     => $baseShop . 'headset/',
-                ];
-
-                $shopFolder = $shopFolders[$cat] ?? null;
+                $shopFolder = shop_upload_folder($cat);
                 if ($shopFolder && !empty($shop_images)) {
                     foreach ($shop_images as $img_name) {
-                        $shop_file_path = $shopFolder . $img_name;
-                        if (file_exists($shop_file_path)) {
-                            unlink($shop_file_path);
-                        }
+                        delete_image($shopFolder, $img_name);
                     }
                 }
-
-                header("Location: admin_products.php?cat=$current_category");
-                exit;
+            } else {
+                $error = "Failed to delete product.";
             }
         }
     }
+
+    header("Location: admin_products.php?cat=" . urlencode($current_category));
+    exit;
 }
 
 if (isset($_GET['success'])) {
-    $message = htmlspecialchars($_GET['success']);
+    $message = h($_GET['success']);
 }
 
 $products = selectByCategoryForAdmin($current_category);
@@ -303,6 +225,7 @@ $products = selectByCategoryForAdmin($current_category);
         <div class="form-box">
             <h2 id="form-title"><i class="fas fa-plus-circle"></i> Add Product to <?= strtoupper($current_category) ?></h2>
             <form id="product-form" method="POST" enctype="multipart/form-data">
+                <?= csrf_field() ?>
                 <input type="hidden" name="id" id="prod-id">
                 <input type="hidden" name="category" value="<?= htmlspecialchars($current_category) ?>">
 
@@ -378,8 +301,25 @@ $products = selectByCategoryForAdmin($current_category);
                                 <td><?= htmlspecialchars($p['brand']) ?></td>
                                 <td style="color:var(--neon-green); font-weight:bold;"><?= number_format($p['price'], 2) ?> DH</td>
                                 <td class="actions-btn">
-                                    <button class="btn-edit" onclick='editProduct(<?= json_encode($p) ?>)'><i class="fas fa-edit"></i></button>
-                                    <a class="btn-delete" href="admin_products.php?cat=<?= $current_category ?>&delete=<?= $p['id'] ?>" onclick="return confirm('Are you sure you want to delete this product?')"><i class="fas fa-trash-alt"></i></a>
+                                    <button
+                                        class="btn-edit js-edit-product"
+                                        type="button"
+                                        data-id="<?= (int) $p['id'] ?>"
+                                        data-name="<?= h($p['name']) ?>"
+                                        data-brand="<?= h($p['brand']) ?>"
+                                        data-price="<?= h((string) $p['price']) ?>"
+                                        data-description="<?= h($p['description'] ?? '') ?>"
+                                        data-main-image="<?= h($p['main_image'] ?? '') ?>"
+                                        data-hover-image="<?= h($p['hover_image'] ?? '') ?>"
+                                    ><i class="fas fa-edit"></i></button>
+
+                                    <form method="POST" action="admin_products.php" class="delete-form"
+                                          onsubmit="return confirm('Are you sure you want to delete this product?')">
+                                        <?= csrf_field() ?>
+                                        <input type="hidden" name="id" value="<?= (int) $p['id'] ?>">
+                                        <input type="hidden" name="delete_product" value="1">
+                                        <button type="submit" class="btn-delete"><i class="fas fa-trash-alt"></i></button>
+                                    </form>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -394,7 +334,24 @@ $products = selectByCategoryForAdmin($current_category);
     </main>
 
 
-    <script src="js/handelAdminProducts"></script>
+    <script src="../../../js/handelAdminProducts.js"></script>
+    <script>
+        // Wire up Edit buttons using their data-* attributes (safer than
+        // embedding json_encode() output inside an HTML onclick attribute).
+        document.querySelectorAll('.js-edit-product').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                editProduct({
+                    id: btn.dataset.id,
+                    name: btn.dataset.name,
+                    brand: btn.dataset.brand,
+                    price: btn.dataset.price,
+                    description: btn.dataset.description,
+                    main_image: btn.dataset.mainImage,
+                    hover_image: btn.dataset.hoverImage
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>

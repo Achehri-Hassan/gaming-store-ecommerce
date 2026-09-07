@@ -210,15 +210,18 @@ INSERT INTO product_gallery ( product_id , image_path , sort_order ) VALUES
 
 (25, 'shop_desk27.webp', 1);
 
-
-
-
-INSERT INTO users (id, username , email, password , role) VALUES (
-  2,
-   "admin",
-  'Hassanadmin@gmail.com',
-  '$2b$12$JF5C8FCg/8A900PaEirbQOHISV/zDPAJh2nieEUlSU4pCBqnIcb3G',
-  "admin"
-);
-
--- cood admin 1234
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Admin account
+-- ─────────────────────────────────────────────────────────────────────────────
+-- No admin account is seeded here on purpose: a hardcoded email/password
+-- hash checked into source control is a real credential leak risk if this
+-- repo is ever made public (or reused as a template) and the password
+-- isn't changed.
+--
+-- Create your own admin account after importing this file by running:
+--
+--     php database/create_admin.php
+--
+-- (see that file for usage — it hashes the password with password_hash()
+-- and inserts a fresh admin row for you; nothing is ever printed or
+-- stored in plaintext.)

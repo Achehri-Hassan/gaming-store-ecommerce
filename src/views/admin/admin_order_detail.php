@@ -13,7 +13,7 @@ if (empty($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-// تعديل باش نستقبلو الـ user_id لي جاي من الـ Fetch ديريكت
+
 $userId = isset($_GET['user_id']) ? (int) $_GET['user_id'] : 0;
 
 if ($userId <= 0) {
@@ -21,7 +21,6 @@ if ($userId <= 0) {
     exit;
 }
 
-// جلب جميع الطلبيات والمنتجات لي شراها هاد الكليان بـ Query وحدة نقية
 $conn = getConnection();
 $stmt = $conn->prepare(" SELECT 
         oi.quantity,
@@ -50,7 +49,7 @@ if (empty($purchases)) {
     exit;
 }
 
-// أخذ معلومات الزبون من أحدث طلبية
+
 $clientInfo = $purchases[0];
 ?>
 

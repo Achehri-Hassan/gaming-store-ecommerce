@@ -27,6 +27,51 @@ function selectById(int $id): ?array
     return $stmt->fetch() ?: null;
 }
 
+/**
+ * Public-facing lookup — only returns the product if it is active.
+ * Use this everywhere a customer (not an admin) can reach a product by ID
+ * (product page, cart, checkout) so inactive/soft-deleted products can never
+ * be viewed, added to cart, or purchased directly.
+ */
+function selectActiveById(int $id): ?array
+{
+    $conn = getConnection();
+    $stmt = $conn->prepare("SELECT * FROM products WHERE id = :id AND is_active = 1");
+    $stmt->execute([':id' => $id]);
+    return $stmt->fetch() ?: null;
+}
+
+/**
+ * Allowed product categories. Single source of truth used to validate
+ * any user-supplied category value before it is ever used to build a
+ * filesystem path (uploads) or a SQL value.
+ */
+function allowed_categories(): array
+{
+    return ['chair', 'desk', 'controller', 'playstation', 'mouse', 'ecran', 'keyboard', 'headset'];
+}
+
+function is_valid_category(string $category): bool
+{
+    return in_array($category, allowed_categories(), true);
+}
+
+/**
+ * Atomically decrement stock for a product, but only if enough stock is
+ * available. Returns true if the row was updated (stock was sufficient),
+ * false otherwise. This is safe under concurrent requests because the
+ * check and the decrement happen in a single SQL statement.
+ */
+function decrementStock(int $productId, int $quantity): bool
+{
+    $conn = getConnection();
+    $stmt = $conn->prepare(
+        "UPDATE products SET stock = stock - :qty WHERE id = :id AND stock >= :qty"
+    );
+    $stmt->execute([':qty' => $quantity, ':id' => $productId]);
+    return $stmt->rowCount() === 1;
+}
+
 function selectProductImages(int $id): array
 {
     $conn = getConnection();

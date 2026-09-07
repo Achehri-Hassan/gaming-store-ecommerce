@@ -70,10 +70,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   
     function fetchCart(data) {
+        // Attach the CSRF token (rendered into a <meta> tag by header.php)
+        // to every cart request. cart-handler.php requires it for any
+        // state-changing action ('add' / 'update_quantity' / 'remove').
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
         fetch('cart-handler.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: JSON.stringify({ ...data, csrf_token: csrfToken })
         })
         .then(response => response.json())
         .then(res => {

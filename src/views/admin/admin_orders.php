@@ -6,6 +6,11 @@ require_once __DIR__ . '/../../models/OrderModel.php';
 if (session_status() === PHP_SESSION_NONE) session_start();
 require_admin();
 
+// The set of statuses an order can be in — must match the ENUM in the
+// `orders` table (see database/orders_migration.sql) and the whitelist
+// enforced server-side by updateOrderStatus().
+const ORDER_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+
 // ── Actions ───────────────────────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -17,11 +22,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             : flash('error', 'Failed to delete order.');
     }
 
+    if (isset($_POST['update_order_status'])) {
+        $id     = (int) ($_POST['order_id'] ?? 0);
+        $status = (string) ($_POST['status'] ?? '');
+
+        if ($id > 0 && in_array($status, ORDER_STATUSES, true)) {
+            updateOrderStatus($id, $status)
+                ? flash('success', "Order #$id status updated to \"$status\".")
+                : flash('error', "Failed to update order #$id.");
+        } else {
+            flash('error', 'Invalid order or status value.');
+        }
+    }
+
     header('Location: admin_orders.php' . ($_SERVER['QUERY_STRING'] ? '?' . $_SERVER['QUERY_STRING'] : ''));
     exit;
 }
 
-// ── Filters & Pagination ──────────────────────────────────────────────────────
+// ── Filters & Pagination (customer summary) ─────────────────────────────────────
 $search      = clean($_GET['search'] ?? '');
 $currentPage = max(1, (int) ($_GET['page'] ?? 1));
 $perPage     = 15;
@@ -30,6 +48,17 @@ $total   = countUniqueCustomers($search);
 $pager   = paginate($total, $perPage, $currentPage);
 $customers = getUniqueCustomers($search, $perPage, $pager['offset']);
 $stats   = getOrderStats();
+
+// ── Filters & Pagination (individual orders — status management) ───────────────
+$ordersSearch      = clean($_GET['orders_search'] ?? '');
+$ordersStatus      = $_GET['orders_status'] ?? '';
+$ordersStatus      = in_array($ordersStatus, ORDER_STATUSES, true) ? $ordersStatus : '';
+$ordersCurrentPage = max(1, (int) ($_GET['orders_page'] ?? 1));
+$ordersPerPage     = 10;
+
+$ordersTotal = countAllOrders($ordersSearch, $ordersStatus);
+$ordersPager = paginate($ordersTotal, $ordersPerPage, $ordersCurrentPage);
+$orders      = getAllOrders($ordersSearch, $ordersStatus, $ordersPerPage, $ordersPager['offset']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -160,6 +189,109 @@ $stats   = getOrderStats();
         <?php endif; ?>
 
     <?php endif; ?>
+
+    <!-- ═══════ Orders — status management & filtering ═══════ -->
+    <div class="header-dash" style="margin-top:36px">
+        <h1><i class="fas fa-truck"></i> Order Status</h1>
+    </div>
+
+    <form method="GET" action="admin_orders.php" class="filter-bar">
+        <input
+            type="text"
+            name="orders_search"
+            placeholder="Search by order #, customer, phone or city…"
+            value="<?= h($ordersSearch) ?>"
+            class="filter-input"
+            style="width: 100%; max-width: 320px;"
+        >
+        <select name="orders_status" class="filter-input" style="max-width:200px">
+            <option value="">All statuses</option>
+            <?php foreach (ORDER_STATUSES as $st): ?>
+                <option value="<?= h($st) ?>" <?= $ordersStatus === $st ? 'selected' : '' ?>>
+                    <?= h(ucfirst($st)) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+        <button type="submit" class="btn btn--primary"><i class="fas fa-filter"></i> Filter</button>
+        <?php if ($ordersSearch || $ordersStatus): ?>
+            <a href="admin_orders.php" class="btn btn--secondary"><i class="fas fa-times"></i> Clear</a>
+        <?php endif; ?>
+    </form>
+
+    <?php if (empty($orders)): ?>
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>No orders match this filter.</p>
+        </div>
+    <?php else: ?>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Total</th>
+                        <th>Placed</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($orders as $order): ?>
+                        <tr>
+                            <td>#<?= (int) $order['id'] ?></td>
+                            <td><?= h($order['customer_name']) ?></td>
+                            <td><?= h($order['phone']) ?></td>
+                            <td><?= price((float) $order['total_price']) ?></td>
+                            <td><?= h(date('d M Y', strtotime($order['created_at']))) ?></td>
+                            <td>
+                                <span class="status-badge status-badge--<?= h($order['status']) ?>">
+                                    <?= h(ucfirst($order['status'])) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <form method="POST" action="admin_orders.php" style="display:flex; gap:6px; align-items:center;">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="order_id" value="<?= (int) $order['id'] ?>">
+                                    <input type="hidden" name="update_order_status" value="1">
+                                    <select name="status" class="filter-input" style="padding:4px 6px;">
+                                        <?php foreach (ORDER_STATUSES as $st): ?>
+                                            <option value="<?= h($st) ?>" <?= $order['status'] === $st ? 'selected' : '' ?>>
+                                                <?= h(ucfirst($st)) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <button type="submit" class="btn btn--icon btn--primary" title="Update status">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <?php if ($ordersPager['total_pages'] > 1): ?>
+            <div class="pagination">
+                <?php
+                $ordersQs   = http_build_query(array_filter(['orders_search' => $ordersSearch, 'orders_status' => $ordersStatus]));
+                $ordersBase = 'admin_orders.php?' . ($ordersQs ? $ordersQs . '&' : '');
+                ?>
+                <?php if ($ordersPager['has_prev']): ?>
+                    <a href="<?= $ordersBase ?>orders_page=<?= $ordersPager['current'] - 1 ?>" class="page-btn"><i class="fas fa-chevron-left"></i></a>
+                <?php endif; ?>
+                <?php for ($p = 1; $p <= $ordersPager['total_pages']; $p++): ?>
+                    <a href="<?= $ordersBase ?>orders_page=<?= $p ?>"
+                       class="page-btn <?= $p === $ordersPager['current'] ? 'active' : '' ?>"><?= $p ?></a>
+                <?php endfor; ?>
+                <?php if ($ordersPager['has_next']): ?>
+                    <a href="<?= $ordersBase ?>orders_page=<?= $ordersPager['current'] + 1 ?>" class="page-btn"><i class="fas fa-chevron-right"></i></a>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
 </main>
 
 <div class="modal-overlay" id="orderModalOverlay" onclick="closeOrderModal()"></div>
@@ -180,7 +312,7 @@ function openCustomerPurchasesModal(userId, name) {
     document.getElementById('modalTitle').textContent = 'Purchases by ' + name;
     document.getElementById('modalBody').innerHTML = '<p style="text-align:center"><i class="fas fa-spinner fa-spin"></i> Fetching client history…</p>';
 
-    // هنا نقوم باستدعاء ملف تفاصيل المنتجات التي اشتراها بالكامل
+   
     fetch('admin_order_detail.php?user_id=' + userId)
         .then(r => r.text())
         .then(html => { document.getElementById('modalBody').innerHTML = html; })

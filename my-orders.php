@@ -74,7 +74,7 @@ foreach ($rows as $row) {
 <div class="orders-container">
     <h1 class="page-title"><i class="fas fa-terminal"></i> Quest Log / My Orders</h1>
 
-    <!-- Inline Modern Filter Bar -->
+    <!-- Inline Filter Bar -->
     <div class="quest-filters">
         <div class="preset-group">
             <a class="preset-btn <?= ($fromDate === null && $toDate === null) ? 'active' : '' ?>" href="my-orders.php?range=all">All</a>
@@ -82,56 +82,54 @@ foreach ($rows as $row) {
             <a class="preset-btn" href="my-orders.php?range=30">30 Days</a>
             <a class="preset-btn" href="my-orders.php?range=month">This Month</a>
         </div>
-
-        <form method="GET" action="my-orders.php" class="date-form">
-            <div class="date-input-wrapper">
-                <label>From</label>
-                <input type="date" name="from" value="<?= h($fromDate ?? '') ?>">
-            </div>
-            <div class="date-input-wrapper">
-                <label>To</label>
-                <input type="date" name="to" value="<?= h($toDate ?? '') ?>">
-            </div>
-            <button type="submit" class="submit-filter-btn"><i class="fas fa-filter"></i> Filter</button>
-        </form>
     </div>
 
     <?= render_flash() ?>
 
+    <!-- Card Grid List -->
     <div class="quest-list">
         <?php if (empty($orders)): ?>
-            <div style="text-align: center; padding: 60px; color: var(--text-muted);">
-                <i class="fas fa-folder-open" style="font-size: 2.5rem; margin-bottom: 15px; display:block;"></i>
+            <div class="no-orders">
+                <i class="fas fa-folder-open"></i>
                 <p>No transactions or quests registered for this timeline.</p>
             </div>
         <?php else: ?>
             <?php foreach ($orders as $order): ?>
                 <div class="quest-row">
-                    <!-- Left: Quest Basics -->
+                    <!-- Top Info Header -->
                     <div class="quest-info">
-                        <span class="quest-id">ORDER #<?= (int) $order['id'] ?></span>
-                        <span class="quest-date"><i class="far fa-clock"></i> <?= h(date('d M Y, H:i', strtotime($order['created_at']))) ?></span>
+                        <div>
+                            <span class="quest-id">ORDER #<?= (int) $order['id'] ?></span>
+                            <span class="quest-date"><i class="far fa-clock"></i> <?= h(date('d M Y, H:i', strtotime($order['created_at']))) ?></span>
+                        </div>
+                        <span class="badge-glitch badge-<?= h($order['status']) ?>">
+                            <?= h($order['status']) ?>
+                        </span>
                     </div>
 
-                    <!-- Center: Inventory Slotted Items (No Table) -->
+                    <!-- Middle Inventory List with Names -->
                     <div class="quest-inventory">
                         <?php foreach ($order['items'] as $item): ?>
-                            <div class="inventory-item" data-name="<?= h($item['product_name'] ?? 'Item') ?> (<?= price((float)$item['purchased_price']) ?>)">
-                                <img src="<?= asset_url($item['category'] ?? '', 'main', $item['main_image'] ?? '') ?>" 
-                                     alt="Product image"
-                                     onerror="this.src='src/assets/placeholder.webp'">
-                                <?php if ((int)$item['quantity'] > 1): ?>
-                                    <span class="item-qty">x<?= (int)$item['quantity'] ?></span>
-                                <?php endif; ?>
+                            <div class="inventory-item">
+                                <div class="item-thumb">
+                                    <img src="<?= asset_url($item['category'] ?? '', 'main', $item['main_image'] ?? '') ?>" 
+                                         alt="Product image"
+                                         onerror="this.src='src/assets/placeholder.webp'">
+                                    <?php if ((int)$item['quantity'] > 1): ?>
+                                        <span class="item-qty">x<?= (int)$item['quantity'] ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="item-details">
+                                    <span class="item-name"><?= h($item['product_name'] ?? 'Item') ?></span>
+                                    
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     </div>
 
-                    <!-- Right: Reward / Meta -->
+                    <!-- Bottom Price Meta -->
                     <div class="quest-meta">
-                        <span class="badge-glitch badge-<?= h($order['status']) ?>">
-                            <?= h($order['status']) ?>
-                        </span>
+                        <span class="total-label">Total Reward:</span>
                         <span class="quest-price"><?= price($order['total']) ?></span>
                     </div>
                 </div>

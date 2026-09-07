@@ -18,7 +18,7 @@ $csrfToken = csrf_token();
       </div>
     </div>
     <div class="search-box">
-      <form method="GET" action="shop-details.php" style="display:contents">
+      <form method="GET" action="shop.php" style="display:contents">
         <input type="text" name="q" placeholder="Search for latest tech, gaming gear…"
           value="<?= h($_GET['q'] ?? '') ?>">
         <button type="submit">SEARCH</button>

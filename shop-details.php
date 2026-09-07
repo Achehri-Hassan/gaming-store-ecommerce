@@ -13,7 +13,15 @@ if ($id <= 0) {
   exit;
 }
 
-$product = selectById($id);
+// Public product pages must never expose an inactive/soft-deleted product,
+// even to someone who guesses or reuses an old direct link.
+$product = selectActiveById($id);
+
+if (!$product) {
+  header('Location: index.php');
+  exit;
+}
+
 $gallery = selectProductImages($id);
 $related = selectRelated($product['category'], $id);
 
