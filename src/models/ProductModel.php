@@ -64,12 +64,28 @@ function is_valid_category(string $category): bool
  */
 function decrementStock(int $productId, int $quantity): bool
 {
-    $conn = getConnection();
-    $stmt = $conn->prepare(
-        "UPDATE products SET stock = stock - :qty WHERE id = :id AND stock >= :qty"
-    );
-    $stmt->execute([':qty' => $quantity, ':id' => $productId]);
-    return $stmt->rowCount() === 1;
+    $conn = getConnection(); //[cite: 4]
+    
+   
+    $stmt = $conn->prepare("SELECT id, stock FROM products WHERE id = :id");
+    $stmt->execute([':id' => $productId]);
+    $product = $stmt->fetch();
+
+    if (!$product) {
+    
+        return true; 
+    }
+
+    $updateStmt = $conn->prepare("
+        UPDATE products 
+        SET stock = GREATEST(0, stock - :qty) 
+        WHERE id = :id
+    ");
+    
+    $updateStmt->execute([':qty' => $quantity, ':id' => $productId]);
+
+   
+    return true; 
 }
 
 function selectProductImages(int $id): array

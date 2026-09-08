@@ -25,7 +25,7 @@ CREATE TABLE products (
     full_title VARCHAR(255),
     slug VARCHAR(255) UNIQUE,
     price DECIMAL(10,2) NOT NULL,
-    stock INT DEFAULT 10,
+    stock INT DEFAULT 100,
     currency VARCHAR(10) DEFAULT 'DH',
     status VARCHAR(50) DEFAULT 'In Stock',
     main_image VARCHAR(255) NOT NULL,
