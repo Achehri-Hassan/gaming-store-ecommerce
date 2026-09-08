@@ -211,8 +211,6 @@ $products = selectByCategoryForAdmin($current_category);
         <div class="category-tabs">
             <a href="admin_products.php?cat=chair" class="tab-btn <?= $current_category === 'chair' ? 'active' : '' ?>">Chairs</a>
             <a href="admin_products.php?cat=mouse" class="tab-btn <?= $current_category === 'mouse' ? 'active' : '' ?>">Mouse</a>
-            <a href="admin_products.php?cat=keyboard" class="tab-btn <?= $current_category === 'keyboard' ? 'active' : '' ?>">Keyboard</a>
-            <a href="admin_products.php?cat=headset" class="tab-btn <?= $current_category === 'headset' ? 'active' : '' ?>">Headset</a>
             <a href="admin_products.php?cat=desk" class="tab-btn <?= $current_category === 'desk' ? 'active' : '' ?>">Desks</a>
             <a href="admin_products.php?cat=controller" class="tab-btn <?= $current_category === 'controller' ? 'active' : '' ?>">Controllers</a>
             <a href="admin_products.php?cat=playstation" class="tab-btn <?= $current_category === 'playstation' ? 'active' : '' ?>">PlayStation</a>
