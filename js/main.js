@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     fetchCart({ action: 'get' });
 
-    // Global click listener for structural delegation (Dynamic buttons)
+
     document.addEventListener('click', (e) => {
         // Add to cart click from Product Card
         if (e.target.classList.contains('add-to-cart-btn')) {
@@ -68,11 +68,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+ 
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+        }[ch]));
+    }
+
   
     function fetchCart(data) {
-        // Attach the CSRF token (rendered into a <meta> tag by header.php)
-        // to every cart request. cart-handler.php requires it for any
-        // state-changing action ('add' / 'update_quantity' / 'remove').
+       
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
         fetch('cart-handler.php', {
@@ -104,22 +113,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Render with dynamic plus/minus controls
-        cartContent.innerHTML = cart.map(item => `
+    
+        cartContent.innerHTML = cart.map(item => {
+            const name     = escapeHtml(item.name);
+            const image    = escapeHtml(item.image);
+            const currency = escapeHtml(item.currency);
+            const id       = escapeHtml(item.id);
+            const qty      = escapeHtml(item.quantity);
+            const price    = escapeHtml(item.price);
+
+            return `
             <div class="cart-box">
-                <img src="${item.image}" alt="${item.name}" />
+                <img src="${image}" alt="${name}" />
                 <div class="detail-box">
-                    <div class="cart-product-title">${item.name}</div>
-                    <div class="cart-price">${item.price} ${item.currency}</div>
+                    <div class="cart-product-title">${name}</div>
+                    <div class="cart-price">${price} ${currency}</div>
                     
                     <div class="cart-quantity-controls">
-                        <button class="cart-qty-btn cart-qty-minus" data-id="${item.id}" data-qty="${item.quantity}">-</button>
-                        <span class="cart-qty-number">${item.quantity}</span>
-                        <button class="cart-qty-btn cart-qty-plus" data-id="${item.id}" data-qty="${item.quantity}">+</button>
+                        <button class="cart-qty-btn cart-qty-minus" data-id="${id}" data-qty="${qty}">-</button>
+                        <span class="cart-qty-number">${qty}</span>
+                        <button class="cart-qty-btn cart-qty-plus" data-id="${id}" data-qty="${qty}">+</button>
                     </div>
                 </div>
-                <i class="fa-solid fa-trash cart-remove-item" data-id="${item.id}"></i>
+                <i class="fa-solid fa-trash cart-remove-item" data-id="${id}"></i>
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
 });
